@@ -29,11 +29,16 @@ def home(latest: GiftPeriod | None, count: int) -> str:
 价值、价格和推荐等级都已经排好。照着查就行。"""
 
 
-def period_list(periods: list[GiftPeriod]) -> str:
+def period_list(
+    periods: list[GiftPeriod], page: int = 1, total_pages: int = 1
+) -> str:
     if not periods:
         return "# 📚 礼包期次\n\n数据库里还没有可查询的期次。"
     names = "\n".join(f"- {period.name}" for period in periods)
-    return f"# 📚 礼包期次\n\n{names}\n\n选择一期，查看该期性价比排名。"
+    return (
+        f"# 📚 礼包期次 · {page}/{total_pages}\n\n{names}"
+        "\n\n选择一期，查看该期性价比排名。"
+    )
 
 
 def _fmt(value: float) -> str:

@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import re
 from typing import Any
 
 import httpx
@@ -59,13 +58,7 @@ class GiftApiClient:
             for row in rows
             if isinstance(row, dict)
             and bool(row.get("is_enabled", True))
-            and (
-                str(row.get("folder_type", "")) in {"periodic", "event_collection"}
-                or re.search(
-                    r"第?\s*[\d零〇一二两三四五六七八九十百]+\s*期",
-                    str(row.get("name", "")),
-                )
-            )
+            and int(row.get("gift_count", 0) or 0) > 0
         ]
         return periods
 

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import re
+import math
 from dataclasses import dataclass
 
 from . import copywriting as copy
@@ -12,6 +13,8 @@ from .models import GiftPeriod, RatingRule
 class GiftView:
     content: str
     periods: tuple[GiftPeriod, ...] = ()
+    period_page: int = 1
+    period_total_pages: int = 1
 
 
 class GiftQueryService:
@@ -72,9 +75,18 @@ class GiftQueryService:
         periods = await self._periods()
         return GiftView(copy.home(periods[0] if periods else None, len(periods)))
 
-    async def periods(self, *, limit: int = 8) -> GiftView:
-        periods = (await self._periods())[:limit]
-        return GiftView(copy.period_list(periods), tuple(periods))
+    async def periods(self, page: int = 1, *, page_size: int = 8) -> GiftView:
+        all_periods = await self._periods()
+        total_pages = max(1, math.ceil(len(all_periods) / page_size))
+        safe_page = max(1, min(page, total_pages))
+        start = (safe_page - 1) * page_size
+        periods = all_periods[start : start + page_size]
+        return GiftView(
+            copy.period_list(periods, safe_page, total_pages),
+            tuple(periods),
+            safe_page,
+            total_pages,
+        )
 
     async def ranking(self, period_query: str = "") -> GiftView:
         periods = await self._periods()

@@ -18,11 +18,16 @@ def parse_gift_command(content: str) -> tuple[str, str] | None:
     if lowered in {"礼包", "/礼包", "礼包查询", "/礼包查询"}:
         return "home", ""
     if lowered in {"礼包期次", "/礼包期次"}:
-        return "periods", ""
+        return "periods", "1"
+    if lowered in {"礼包列表", "/礼包列表"}:
+        return "periods", "1"
     if lowered in {"礼包排行", "/礼包排行"}:
         return "ranking", ""
     if lowered in {"礼包搜索", "/礼包搜索", "礼包搜索说明", "/礼包搜索说明"}:
         return "search_guide", ""
+    matched = re.fullmatch(r"/?礼包列表\s+(\d+)", text, re.I)
+    if matched:
+        return "periods", matched.group(1)
     matched = re.fullmatch(r"/?礼包期次\s+(.+)", text, re.I)
     if matched:
         return "ranking", matched.group(1).strip()
@@ -58,7 +63,7 @@ class GiftController:
             if action == "home":
                 view = await self._service.home()
             elif action == "periods":
-                view = await self._service.periods()
+                view = await self._service.periods(int(argument or "1"))
             elif action == "ranking":
                 view = await self._service.ranking(argument)
             elif action == "search_guide":
@@ -70,6 +75,8 @@ class GiftController:
                 chat_id,
                 view.content,
                 periods=view.periods,
+                period_page=view.period_page,
+                period_total_pages=view.period_total_pages,
                 reply_to=context.message_id,
             )
         except GiftApiError as exc:
@@ -79,4 +86,3 @@ class GiftController:
             logger.exception("[GIFT] unexpected query failure | action=%s", action)
             await context.reply(copy.error_text("未预期的数据故障"))
         return True
-

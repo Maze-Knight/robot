@@ -151,7 +151,9 @@ def build_gift_keyboard() -> InlineKeyboard:
     )
 
 
-def build_gift_periods_keyboard(period_names: list[str]) -> InlineKeyboard:
+def build_gift_periods_keyboard(
+    period_names: list[str], *, page: int = 1, total_pages: int = 1
+) -> InlineKeyboard:
     buttons = [
         _command_button(
             f"gift_period_{index}",
@@ -161,12 +163,19 @@ def build_gift_periods_keyboard(period_names: list[str]) -> InlineKeyboard:
         for index, name in enumerate(period_names[:8], start=1)
     ]
     rows = [buttons[index : index + 2] for index in range(0, len(buttons), 2)]
-    rows.append(
-        [
-            _command_button("gift_period_home", "🎁 查询首页", "/礼包查询", style=0),
-            _command_button("gift_period_back", "🔙 市政服务", "/市政服务", style=0),
-        ]
+    navigation: list[KeyboardButton] = []
+    if page > 1:
+        navigation.append(
+            _command_button("gift_period_prev", "⬅️ 上一页", f"/礼包列表 {page - 1}", style=0)
+        )
+    if page < total_pages:
+        navigation.append(
+            _command_button("gift_period_next", "➡️ 下一页", f"/礼包列表 {page + 1}", style=0)
+        )
+    navigation.append(
+        _command_button("gift_period_home", "🎁 查询首页", "/礼包查询", style=0)
     )
+    rows.append(navigation)
     return _keyboard(rows)
 
 

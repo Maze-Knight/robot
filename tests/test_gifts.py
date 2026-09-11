@@ -17,6 +17,7 @@ class GiftCommandTests(unittest.TestCase):
     def test_chinese_query_commands(self) -> None:
         self.assertEqual(parse_gift_command("/礼包查询"), ("home", ""))
         self.assertEqual(parse_gift_command("/礼包排行"), ("ranking", ""))
+        self.assertEqual(parse_gift_command("/礼包列表 2"), ("periods", "2"))
         self.assertEqual(
             parse_gift_command("/礼包期次 第12期"), ("ranking", "第12期")
         )
@@ -37,6 +38,7 @@ class GiftApiTests(unittest.IsolatedAsyncioTestCase):
                             "code": "p12",
                             "folder_type": "periodic",
                             "sort_order": 12,
+                            "gift_count": 1,
                             "is_enabled": True,
                             "created_at": "2026-09-01T00:00:00Z",
                         },
@@ -44,6 +46,7 @@ class GiftApiTests(unittest.IsolatedAsyncioTestCase):
                             "id": "admin-folder",
                             "name": "后台草稿",
                             "folder_type": "other",
+                            "gift_count": 0,
                             "is_enabled": True,
                         },
                     ],

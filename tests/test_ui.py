@@ -115,8 +115,15 @@ class KeyboardTests(unittest.TestCase):
                 "/礼包期次 第十二期",
                 "/礼包期次 第十一期",
                 "/礼包查询",
-                "/市政服务",
             ],
+        )
+        self.assertEqual(
+            self._button_data(
+                build_gift_periods_keyboard(
+                    ["皮拉活动礼包第一周"], page=1, total_pages=2
+                )
+            ),
+            ["/礼包期次 皮拉活动礼包第一周", "/礼包列表 2", "/礼包查询"],
         )
 
     def test_steam_menu_is_shallow_and_uses_stable_data(self) -> None:

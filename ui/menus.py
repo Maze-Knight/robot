@@ -192,10 +192,16 @@ class MenuService:
         content: str,
         *,
         periods: tuple[GiftPeriod, ...] = (),
+        period_page: int = 1,
+        period_total_pages: int = 1,
         reply_to: str | None = None,
     ) -> dict[str, Any]:
         keyboard = (
-            build_gift_periods_keyboard([period.name for period in periods])
+            build_gift_periods_keyboard(
+                [period.name for period in periods],
+                page=period_page,
+                total_pages=period_total_pages,
+            )
             if periods
             else build_gift_keyboard()
         )
