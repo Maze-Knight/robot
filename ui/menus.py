@@ -9,6 +9,8 @@ from .keyboards import (
     build_action_test_keyboard,
     build_experiments_keyboard,
     build_help_keyboard,
+    build_gift_keyboard,
+    build_gift_periods_keyboard,
     build_main_keyboard,
     build_notices_keyboard,
     build_services_keyboard,
@@ -17,6 +19,7 @@ from .keyboards import (
     build_steam_unbound_keyboard,
 )
 from steam import copywriting as steam_copy
+from gifts.models import GiftPeriod
 
 
 class TerminalStatus:
@@ -180,6 +183,28 @@ class MenuService:
             content,
             build_steam_result_keyboard() if bound else build_steam_unbound_keyboard(),
             event_id=event_id,
+        )
+
+    async def send_gift_view(
+        self,
+        scene: str,
+        chat_id: str,
+        content: str,
+        *,
+        periods: tuple[GiftPeriod, ...] = (),
+        reply_to: str | None = None,
+    ) -> dict[str, Any]:
+        keyboard = (
+            build_gift_periods_keyboard([period.name for period in periods])
+            if periods
+            else build_gift_keyboard()
+        )
+        return await self._send_markdown_keyboard(
+            scene,
+            chat_id,
+            content,
+            keyboard,
+            reply_to=reply_to,
         )
 
     async def send_experiments_menu(

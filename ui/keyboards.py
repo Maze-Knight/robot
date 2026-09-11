@@ -123,14 +123,51 @@ def build_services_keyboard() -> InlineKeyboard:
         [
             [
                 _command_button("service_steam", "🎮 Steam 监测站", "/Steam监测站"),
-                _command_button("service_draw", "🎲 每日抽取", "/每日抽取"),
+                _command_button("service_gifts", "🎁 礼包性价比", "/礼包查询"),
             ],
             [
+                _command_button("service_draw", "🎲 每日抽取", "/每日抽取"),
                 _command_button("service_collection", "📖 图鉴", "/图鉴"),
+            ],
+            [
                 _command_button("service_home", "🔙 返回终端", "/返回终端", style=0),
             ],
         ]
     )
+
+
+def build_gift_keyboard() -> InlineKeyboard:
+    return _keyboard(
+        [
+            [
+                _command_button("gift_latest", "📊 最新一期", "/礼包排行"),
+                _command_button("gift_periods", "📚 选择期次", "/礼包期次"),
+            ],
+            [
+                _command_button("gift_search", "🔎 查询礼包", "/礼包搜索说明"),
+                _command_button("gift_back", "🔙 市政服务", "/市政服务", style=0),
+            ],
+        ]
+    )
+
+
+def build_gift_periods_keyboard(period_names: list[str]) -> InlineKeyboard:
+    buttons = [
+        _command_button(
+            f"gift_period_{index}",
+            name[:20],
+            f"/礼包期次 {name}",
+        )
+        for index, name in enumerate(period_names[:8], start=1)
+    ]
+    rows = [buttons[index : index + 2] for index in range(0, len(buttons), 2)]
+    rows.append(
+        [
+            _command_button("gift_period_home", "🎁 查询首页", "/礼包查询", style=0),
+            _command_button("gift_period_back", "🔙 市政服务", "/市政服务", style=0),
+        ]
+    )
+    return _keyboard(rows)
 
 
 def build_steam_keyboard() -> InlineKeyboard:

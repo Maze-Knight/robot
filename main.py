@@ -43,6 +43,7 @@ class MessageContext:
     show_main_menu: UIFunction | None = field(default=None, repr=False)
     show_markdown_test: UIFunction | None = field(default=None, repr=False)
     steam_handler: PluginHandler | None = field(default=None, repr=False)
+    gift_handler: PluginHandler | None = field(default=None, repr=False)
     menu_handler: PluginHandler | None = field(default=None, repr=False)
 
 
@@ -155,6 +156,7 @@ async def handle_message(context: MessageContext) -> None:
 
     for handler_name, handler in (
         ("Steam消息", context.steam_handler),
+        ("礼包查询", context.gift_handler),
         ("菜单指令", context.menu_handler),
     ):
         if handler is None:
@@ -187,6 +189,7 @@ def make_message_context(
     show_main_menu: UIFunction | None = None,
     show_markdown_test: UIFunction | None = None,
     steam_handler: PluginHandler | None = None,
+    gift_handler: PluginHandler | None = None,
     menu_handler: PluginHandler | None = None,
 ) -> MessageContext:
     """Convert an SDK InboundEvent into the stable application context."""
@@ -213,6 +216,7 @@ def make_message_context(
         show_main_menu=show_main_menu,
         show_markdown_test=show_markdown_test,
         steam_handler=steam_handler,
+        gift_handler=gift_handler,
         menu_handler=menu_handler,
     )
 
@@ -237,6 +241,9 @@ async def run_bot(settings: Settings) -> None:
     from steam.monitor import SteamMonitor
     from steam.repository import SteamRepository
     from steam.service import SteamService
+    from gifts.client import GiftApiClient
+    from gifts.commands import GiftController
+    from gifts.service import GiftQueryService
 
     # SDK 1.2.2 has no public per-client intents argument and otherwise requests
     # unrelated guild/interaction privileges. Keep this pinned-version project
@@ -275,6 +282,13 @@ async def run_bot(settings: Settings) -> None:
         )
         steam_service = SteamService(steam_client, steam_repository)
         steam_controller = SteamController(steam_service, menus)
+        gift_client = GiftApiClient(
+            http_client,
+            settings.gift_api_base_url,
+            timeout=settings.gift_request_timeout,
+        )
+        gift_service = GiftQueryService(gift_client)
+        gift_controller = GiftController(gift_service, menus)
         steam_monitor = SteamMonitor(settings.steam_monitor_enabled)
         if steam_monitor.enabled:
             logger.warning(
@@ -283,6 +297,10 @@ async def run_bot(settings: Settings) -> None:
         logger.info(
             "[STEAM] active query initialized | api_key_configured=%s | monitor_enabled=false",
             steam_client.configured,
+        )
+        logger.info(
+            "[GIFT] query initialized | api_configured=%s",
+            gift_client.configured,
         )
 
         async def on_message_event(event_type: str, raw: dict[str, Any]) -> None:
@@ -303,6 +321,7 @@ async def run_bot(settings: Settings) -> None:
                         event.chat_scope, event.chat_id, event.message_id
                     ),
                     steam_handler=steam_controller.handle_text,
+                    gift_handler=gift_controller.handle_text,
                     menu_handler=menus.handle_text,
                 )
                 logger.info(

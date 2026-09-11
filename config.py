@@ -26,6 +26,8 @@ class Settings:
     steam_request_timeout: float
     steam_retry_times: int
     steam_monitor_enabled: bool
+    gift_api_base_url: str
+    gift_request_timeout: float
 
     def apply_sdk_environment(self) -> None:
         """Set SDK endpoint overrides before qqbot_agent_sdk is imported."""
@@ -55,9 +57,11 @@ def load_settings() -> Settings:
     try:
         steam_timeout = float(os.getenv("STEAM_REQUEST_TIMEOUT", "15"))
         steam_retries = int(os.getenv("STEAM_RETRY_TIMES", "2"))
+        gift_timeout = float(os.getenv("GIFT_REQUEST_TIMEOUT", "15"))
     except ValueError as exc:
         raise ConfigurationError(
-            "STEAM_REQUEST_TIMEOUT 或 STEAM_RETRY_TIMES 格式无效。"
+            "STEAM_REQUEST_TIMEOUT、STEAM_RETRY_TIMES 或 "
+            "GIFT_REQUEST_TIMEOUT 格式无效。"
         ) from exc
 
     return Settings(
@@ -78,4 +82,6 @@ def load_settings() -> Settings:
         .strip()
         .casefold()
         in {"1", "true", "yes", "on"},
+        gift_api_base_url=os.getenv("GIFT_API_BASE_URL", "").strip().rstrip("/"),
+        gift_request_timeout=max(5.0, min(60.0, gift_timeout)),
     )

@@ -9,6 +9,8 @@ from ui.interactions import handle_interaction
 from ui.keyboards import (
     build_action_test_keyboard,
     build_experiments_keyboard,
+    build_gift_keyboard,
+    build_gift_periods_keyboard,
     build_help_keyboard,
     build_main_keyboard,
     build_notices_keyboard,
@@ -77,6 +79,8 @@ class KeyboardTests(unittest.TestCase):
             build_experiments_keyboard(),
             build_notices_keyboard(),
             build_help_keyboard(),
+            build_gift_keyboard(),
+            build_gift_periods_keyboard(["第十二期"]),
         )
         for keyboard in keyboards:
             rows = keyboard.to_dict()["content"]["rows"]
@@ -93,9 +97,25 @@ class KeyboardTests(unittest.TestCase):
             self._button_data(build_services_keyboard()),
             [
                 "/Steam监测站",
+                "/礼包查询",
                 "/每日抽取",
                 "/图鉴",
                 "/返回终端",
+            ],
+        )
+
+    def test_gift_buttons_emit_chinese_commands(self) -> None:
+        self.assertEqual(
+            self._button_data(build_gift_keyboard()),
+            ["/礼包排行", "/礼包期次", "/礼包搜索说明", "/市政服务"],
+        )
+        self.assertEqual(
+            self._button_data(build_gift_periods_keyboard(["第十二期", "第十一期"])),
+            [
+                "/礼包期次 第十二期",
+                "/礼包期次 第十一期",
+                "/礼包查询",
+                "/市政服务",
             ],
         )
 

@@ -21,7 +21,7 @@
 [📢 公告记录] [📖 使用说明]
 ```
 
-菜单最大深度为主菜单到二级菜单。Steam、每日抽取、图鉴和实验功能目前只有符合艾琳娜角色语言规范的占位回复，没有接入任何正式插件。角色文案集中在 `ui/copywriting.py`；菜单页面、键盘和 Interaction 路由分别位于 `ui/menus.py`、`ui/keyboards.py`、`ui/interactions.py`。
+菜单最大深度为主菜单到二级菜单。Steam 监测站与礼包性价比查询已经接入；每日抽取、图鉴和实验功能仍是占位回复。角色文案集中在 `ui/copywriting.py`；菜单页面、键盘和 Interaction 路由分别位于 `ui/menus.py`、`ui/keyboards.py`、`ui/interactions.py`。
 
 当前不包含 NoneBot2、数据库、AI 或任何旧机器人插件。
 
@@ -66,6 +66,9 @@ qq-official-bot/
 ├─ .gitignore               # 排除密钥、虚拟环境、缓存和运行日志
 ├─ requirements.txt         # 固定官方 SDK 版本及直接依赖
 ├─ README.md                # 本文档
+├─ gifts/                   # 礼包网站只读 API、期次查询与展示
+├─ steam/                   # Steam 主动查询与身份绑定
+├─ ui/                      # Markdown 菜单和中文指令按钮
 ├─ logs/
 │  └─ .gitkeep              # 保留空日志目录
 └─ tests/
@@ -110,6 +113,12 @@ notepad .env
 ```dotenv
 QQ_APP_ID=你的AppID
 QQ_APP_SECRET=你的AppSecret
+```
+
+礼包查询还需要填写已经部署的网站根地址（没有地址时机器人仍可启动，只有礼包模块会提示未配置）：
+
+```dotenv
+GIFT_API_BASE_URL=https://你的礼包网站域名
 ```
 
 不要填写旧式 Token，也不要提交 `.env`。如果密钥曾进入聊天、日志或 Git 历史，请立即在 QQ 开放平台重置 AppSecret。
@@ -254,6 +263,34 @@ await handle_message(context)
 ```
 
 后续 NoneBot2 或插件适配应接在这个边界之后，不应让插件直接依赖 QQ 原始事件对象。
+
+## 🎁 礼包性价比查询
+
+入口：`市政终端 → 市政服务 → 礼包性价比`。机器人只读调用礼包网站已有 API，不保存 Supabase 管理密钥，也不复制网站数据库。网站后台新增或修改礼包后，机器人下次查询会直接读取最新数据。
+
+支持的中文指令：
+
+```text
+/礼包查询                 打开查询首页
+/礼包排行                 查看最新一期排行
+/礼包期次                 选择最近期次
+/礼包期次 第12期          查询指定期次
+礼包 每周特惠             按名称模糊搜索
+```
+
+“期次”来自网站的 `gift_folders`。优先读取 `periodic`、`event_collection` 类型，也兼容名称中包含“第 N 期/N 期”的旧文件夹。最新一期优先按期号判断，没有期号时再按创建时间判断。
+
+统一展示售价、折算水晶叶总价值、每元价值和推荐等级。付费礼包按每元价值降序；价格为零且有价值的免费礼包单独置顶，不把网站内部的 `999999` 哨兵值展示给用户。阶梯礼包保留阶梯编号。
+
+需要网站保持以下公开只读接口可访问：
+
+```text
+GET /api/gift-folders
+GET /api/gifts
+GET /api/ratings/enabled
+```
+
+压缩包不包含线上数据库或部署域名，因此只有填写真实 `GIFT_API_BASE_URL` 后，才能进行真实每期数据联调。
 
 ## 🎮 Steam 监测站（第一阶段）
 
