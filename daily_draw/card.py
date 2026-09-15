@@ -37,30 +37,21 @@ class DailyDrawCardRenderer:
 
         card_w, card_h = 176, 245
         start_x, start_y, gap_x, gap_y = 42, 90, 16, 22
-        rarity_colors = {1: "#8b98a5", 2: "#9b6de3", 3: "#f1b94b"}
+        card_color = "#55b8de"
         for index, item in enumerate(record.items):
             row, column = divmod(index, 5)
             x = start_x + column * (card_w + gap_x)
             y = start_y + row * (card_h + gap_y)
-            color = rarity_colors[item.rarity]
             draw.rounded_rectangle(
                 (x, y, x + card_w, y + card_h),
                 radius=16,
                 fill="#15283a",
-                outline=color,
+                outline=card_color,
                 width=4,
             )
             portrait = self._load_portrait(item.image)
             canvas.paste(portrait, (x + 12, y + 12))
-            stars = "★" * item.rarity
-            star_box = draw.textbbox((0, 0), stars, font=name_font)
-            draw.text(
-                (x + (card_w - (star_box[2] - star_box[0])) / 2, y + 172),
-                stars,
-                font=name_font,
-                fill=color,
-            )
-            self._draw_centered_name(draw, item.name, x, y + 205, card_w, name_font)
+            self._draw_centered_name(draw, item.name, x, y + 190, card_w, name_font)
 
         draw.text(
             (42, 620),
@@ -109,7 +100,7 @@ class DailyDrawCardRenderer:
             fill="#27384a",
         )
 
-        colors = {1: "#8b98a5", 2: "#9b6de3", 3: "#f1b94b"}
+        unlocked_color = "#ff6685"
         for index, entry in enumerate(snapshot.entries):
             row, column = divmod(index, columns)
             x = start_x + column * (tile_w + gap_x)
@@ -125,12 +116,11 @@ class DailyDrawCardRenderer:
                 self._draw_lock(draw, x + tile_w // 2, y + 43)
                 self._draw_centered_name(draw, "未解锁", x, y + 96, tile_w, name_font)
                 continue
-            color = colors.get(min(entry.item.rarity, 3), colors[3])
             draw.rounded_rectangle(
                 (x, y, x + tile_w, y + tile_h),
                 radius=10,
                 fill="#ffffff",
-                outline=color,
+                outline=unlocked_color,
                 width=3,
             )
             portrait = self._load_portrait(entry.item.image, size=78)
@@ -140,7 +130,7 @@ class DailyDrawCardRenderer:
             draw.rounded_rectangle(
                 (x + 5, y + 5, x + 13 + level_box[2], y + 27),
                 radius=8,
-                fill=color,
+                fill=unlocked_color,
             )
             draw.text((x + 9, y + 6), level, font=star_font, fill="#ffffff")
             self._draw_centered_name(
@@ -183,12 +173,14 @@ class DailyDrawCardRenderer:
             if not path.is_relative_to(self.asset_dir.resolve()):
                 raise ValueError("invalid portrait path")
             with Image.open(path) as image:
-                portrait = image.convert("RGB")
+                portrait = image.convert("RGBA")
                 portrait.thumbnail((size, size), Image.Resampling.LANCZOS)
                 background = Image.new("RGB", (size, size), "#e9eef3")
+                position = ((size - portrait.width) // 2, (size - portrait.height) // 2)
                 background.paste(
                     portrait,
-                    ((size - portrait.width) // 2, (size - portrait.height) // 2),
+                    position,
+                    portrait,
                 )
                 return background
         except (OSError, ValueError):

@@ -7,15 +7,13 @@ HOME = """# 🎲 每日抽取
 
 每天可进行一次十连。
 
-概率参数：★★★ 3%｜★★ 21%｜★ 76%
-
-十连至少出现一个 ★★ 或以上。规则已经校准，照着抽就行。"""
+全部使徒属于同一抽取级别，每一抽等概率。规则已经校准，照着抽就行。"""
 
 POOL_NOT_READY = """# 🎲 每日抽取
 
 抽取名单还没装填。
 
-概率系统已经校准，但本市长不会拿空白数据糊弄你。本次不消耗今日次数。"""
+抽取系统已经校准，但本市长不会拿空白数据糊弄你。本次不消耗今日次数。"""
 
 NO_RECORD = """# 📜 今日抽取记录
 
@@ -30,7 +28,7 @@ def record_text(
 ) -> str:
     heading = "今天已经抽过了。以下是记录：" if already_drawn else "抽取完成。结果当然已经算好了。"
     lines = [
-        f"{index}. {'★' * item.rarity} **{item.name}**"
+        f"{index}. **{item.name}**"
         for index, item in enumerate(record.items, start=1)
     ]
     result = f"# 🎲 每日十连\n\n{heading}\n\n" + "\n".join(lines)

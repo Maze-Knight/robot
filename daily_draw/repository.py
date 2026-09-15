@@ -62,8 +62,40 @@ class DrawRepository:
                 )
                 """
             )
+            connection.execute(
+                """
+                CREATE TABLE IF NOT EXISTS daily_draw_meta (
+                    key TEXT PRIMARY KEY,
+                    value TEXT NOT NULL
+                )
+                """
+            )
             self._migrate_to_user_scope_sync(connection)
             self._backfill_collection_sync(connection)
+
+    async def ensure_pool_version(self, pool_id: str) -> bool:
+        """Clear records atomically when the configured pool changes."""
+        if not pool_id:
+            return False
+        return await asyncio.to_thread(self._ensure_pool_version_sync, pool_id)
+
+    def _ensure_pool_version_sync(self, pool_id: str) -> bool:
+        with closing(self._connect()) as connection, connection:
+            row = connection.execute(
+                "SELECT value FROM daily_draw_meta WHERE key='pool_id'"
+            ).fetchone()
+            stored_pool_id = str(row["value"]) if row is not None else ""
+            if stored_pool_id == pool_id:
+                return False
+            connection.execute("DELETE FROM daily_draw_records")
+            connection.execute("DELETE FROM daily_draw_collection")
+            connection.execute("DELETE FROM daily_draw_collection_applied")
+            connection.execute(
+                "INSERT INTO daily_draw_meta(key,value) VALUES('pool_id',?) "
+                "ON CONFLICT(key) DO UPDATE SET value=excluded.value",
+                (pool_id,),
+            )
+            return True
 
     @staticmethod
     def _migrate_to_user_scope_sync(connection: sqlite3.Connection) -> None:
@@ -136,7 +168,14 @@ class DrawRepository:
             ).fetchone()
         if row is None:
             return None
-        items = tuple(DrawItem(**item) for item in json.loads(row["result_json"]))
+        items = tuple(
+            DrawItem(
+                item_id=str(item["item_id"]),
+                name=str(item["name"]),
+                image=str(item.get("image", "")),
+            )
+            for item in json.loads(row["result_json"])
+        )
         return DrawRecord(identity, draw_date, items, str(row["created_at"]))
 
     async def save_if_absent(self, record: DrawRecord) -> tuple[DrawRecord, bool]:
@@ -151,7 +190,6 @@ class DrawRepository:
                 {
                     "item_id": item.item_id,
                     "name": item.name,
-                    "rarity": item.rarity,
                     "image": item.image,
                 }
                 for item in record.items

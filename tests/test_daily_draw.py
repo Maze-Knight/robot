@@ -17,45 +17,33 @@ from PIL import Image
 
 
 class FakeRandom:
-    def __init__(self, rolls: list[int]) -> None:
-        self.rolls = iter(rolls)
-
-    def randrange(self, stop: int) -> int:
-        value = next(self.rolls)
-        if not 0 <= value < stop:
-            raise AssertionError(f"test roll {value} outside randrange({stop})")
-        return value
+    def __init__(self, choices: list[int] | None = None) -> None:
+        self.choices = iter(choices or [0] * 100)
 
     def choice(self, sequence: tuple[object, ...]) -> object:
-        return sequence[0]
+        return sequence[next(self.choices) % len(sequence)]
 
 
 def write_pool(path: Path, *, ready: bool = True) -> DrawCatalog:
     payload = {
-        "three_star": [{"id": "three", "name": "三星测试项"}] if ready else [],
-        "two_star": [{"id": "two", "name": "二星测试项"}] if ready else [],
-        "one_star": [{"id": "one", "name": "一星测试项"}] if ready else [],
+        "pool_id": "test-uniform-v1",
+        "items": [
+            {"id": "one", "name": "测试使徒一", "image": "one.png"},
+            {"id": "two", "name": "测试使徒二", "image": "two.png"},
+        ] if ready else [],
     }
     path.write_text(json.dumps(payload, ensure_ascii=False), encoding="utf-8")
     return DrawCatalog.load(path)
 
 
 class DrawEngineTests(unittest.TestCase):
-    def test_probability_boundaries(self) -> None:
-        engine = DrawEngine(FakeRandom([0, 299, 300, 2399, 2400, 9999]))
-        self.assertEqual(
-            [engine._roll_rarity() for _ in range(6)],
-            [3, 3, 2, 2, 1, 1],
-        )
-
-    def test_ten_pull_guarantees_two_star_or_higher(self) -> None:
+    def test_ten_pull_uses_one_uniform_pool(self) -> None:
         with tempfile.TemporaryDirectory() as folder:
             catalog = write_pool(Path(folder) / "pool.json")
-            engine = DrawEngine(FakeRandom([9_999] * 10 + [2_399]))
+            engine = DrawEngine(FakeRandom(list(range(10))))
             result = engine.draw_ten(catalog)
         self.assertEqual(len(result), 10)
-        self.assertTrue(any(item.rarity >= 2 for item in result))
-        self.assertEqual(result[-1].rarity, 2)
+        self.assertEqual([item.item_id for item in result], ["one", "two"] * 5)
 
     def test_renderer_builds_ten_pull_png_with_portraits(self) -> None:
         from daily_draw.models import DrawItem, DrawRecord
@@ -63,7 +51,7 @@ class DrawEngineTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as folder:
             root = Path(folder)
             Image.new("RGB", (252, 252), "#ff99aa").save(root / "portrait.png")
-            item = DrawItem("test", "测试使徒", 3, "portrait.png")
+            item = DrawItem("test", "测试使徒", "portrait.png")
             record = DrawRecord(
                 DrawIdentity("qq_official", "member"),
                 "2026-09-15",
@@ -83,10 +71,10 @@ class DrawEngineTests(unittest.TestCase):
             Image.new("RGB", (252, 252), "#ff99aa").save(root / "portrait.png")
             entries = tuple(
                 CollectionEntry(
-                    DrawItem(str(index), f"使徒{index}", index % 3 + 1, "portrait.png"),
+                    DrawItem(str(index), f"使徒{index}", "portrait.png"),
                     2 if index < 3 else 0,
                 )
-                for index in range(133)
+                for index in range(78)
             )
             snapshot = CollectionSnapshot(
                 DrawIdentity("qq_official", "member"), entries
@@ -94,7 +82,7 @@ class DrawEngineTests(unittest.TestCase):
             rendered = DailyDrawCardRenderer(root).render_collection(snapshot)
             with Image.open(__import__("io").BytesIO(rendered)) as image:
                 self.assertGreaterEqual(image.width, 1700)
-                self.assertGreaterEqual(image.height, 1300)
+                self.assertGreaterEqual(image.height, 900)
                 self.assertEqual(image.format, "PNG")
 
 
@@ -120,7 +108,7 @@ class DailyDrawServiceTests(unittest.IsolatedAsyncioTestCase):
             await repository.initialize()
             catalog = write_pool(root / "pool.json")
             service = DailyDrawService(
-                catalog, repository, DrawEngine(FakeRandom([0] * 20))
+                catalog, repository, DrawEngine(FakeRandom())
             )
             identity = DrawIdentity("qq_official", "member", "group")
             first = await service.draw(identity)
@@ -131,7 +119,7 @@ class DailyDrawServiceTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(first.record, second.record)
         self.assertEqual(len(first.updates), 1)
         self.assertEqual(first.updates[0].copies, 10)
-        self.assertEqual(first.updates[0].current_stars, 12)
+        self.assertEqual(first.updates[0].current_stars, 10)
         self.assertEqual(collection.unlocked_count, 1)
         self.assertEqual(collection.entries[0].copies, 10)
 
@@ -142,7 +130,7 @@ class DailyDrawServiceTests(unittest.IsolatedAsyncioTestCase):
             await repository.initialize()
             catalog = write_pool(root / "pool.json")
             old_service = DailyDrawService(
-                catalog, repository, DrawEngine(FakeRandom([0] * 20))
+                catalog, repository, DrawEngine(FakeRandom())
             )
             await old_service.draw(DrawIdentity("qq_official", "member", "old-group"))
 
@@ -156,6 +144,25 @@ class DailyDrawServiceTests(unittest.IsolatedAsyncioTestCase):
         self.assertIsNotNone(record)
         self.assertEqual(collection.unlocked_count, 1)
         self.assertEqual(collection.entries[0].copies, 10)
+
+    async def test_pool_change_clears_old_draws_and_collection(self) -> None:
+        with tempfile.TemporaryDirectory() as folder:
+            root = Path(folder)
+            repository = DrawRepository(root / "draw.sqlite3")
+            await repository.initialize()
+            catalog = write_pool(root / "pool.json")
+            await repository.ensure_pool_version(catalog.pool_id)
+            service = DailyDrawService(catalog, repository, DrawEngine(FakeRandom()))
+            identity = DrawIdentity("qq_official", "member")
+            await service.draw(identity)
+
+            changed = await repository.ensure_pool_version("replacement-pool-v2")
+            stored = await service.get_today(identity)
+            collection = await service.collection(identity)
+
+        self.assertTrue(changed)
+        self.assertIsNone(stored)
+        self.assertEqual(collection.unlocked_count, 0)
 
 
 class DailyDrawControllerTests(unittest.IsolatedAsyncioTestCase):

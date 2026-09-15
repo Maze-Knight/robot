@@ -14,7 +14,7 @@ cd C:\Bots\ElenaBot
 
 出现 `ONLINE（Gateway 已 READY/RESUMED）` 才表示连接成功。日志写入 EXE 同目录的 `logs\bot.log`，Steam 身份数据写入 `data\steam.sqlite3`，每日抽取记录写入 `data\daily_draw.sqlite3`。
 
-`daily_draw_pool.json` 必须和 `ElenaBot.exe` 放在同一目录。韩服使徒头像已经打包进 EXE；奖池 JSON 负责名称、星级和图片映射。
+`daily_draw_pool.json` 必须和 `ElenaBot.exe` 放在同一目录。Crayon Note 使徒头像已经打包进 EXE；奖池 JSON 负责名称和图片映射。新奖池首次加载时会自动清空旧每日抽取记录与旧图鉴进度。
 
 程序带有单实例锁。重复启动时，新进程会显示“机器人已经在运行”并退出，不会让同一条 QQ 消息被回复两次。
 

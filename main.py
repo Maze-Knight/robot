@@ -309,7 +309,13 @@ async def run_bot(settings: Settings) -> None:
             draw_catalog = DrawCatalog.load(APP_DIR / "daily_draw_pool.json")
         except DrawCatalogError as exc:
             logger.error("[DAILY_DRAW] 奖池配置无效 | reason=%s", exc)
-            draw_catalog = DrawCatalog({rarity: () for rarity in (1, 2, 3)})
+            draw_catalog = DrawCatalog(())
+        if draw_catalog.ready:
+            pool_reset = await draw_repository.ensure_pool_version(draw_catalog.pool_id)
+            if pool_reset:
+                logger.warning(
+                    "[DAILY_DRAW] pool changed | previous draw and collection records cleared"
+                )
         draw_service = DailyDrawService(draw_catalog, draw_repository)
         draw_controller = DailyDrawController(
             draw_service,

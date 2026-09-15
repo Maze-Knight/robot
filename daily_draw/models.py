@@ -14,7 +14,6 @@ class DrawIdentity:
 class DrawItem:
     item_id: str
     name: str
-    rarity: int
     image: str = ""
 
 
@@ -37,7 +36,7 @@ class CollectionEntry:
 
     @property
     def current_stars(self) -> int:
-        return self.item.rarity + max(0, self.copies - 1)
+        return self.copies
 
 
 @dataclass(frozen=True, slots=True)
@@ -70,4 +69,4 @@ class CollectionUpdate:
 
     @property
     def current_stars(self) -> int:
-        return self.item.rarity + self.copies - 1
+        return self.copies

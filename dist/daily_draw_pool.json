@@ -1,942 +1,553 @@
 {
-  "source": "https://www.gamekee.com/tr/second/127885",
-  "server": "韩服",
-  "synced_at": "2026-09-15T02:03:59+00:00",
-  "three_star": [
+  "pool_id": "crayon-note-checklist-uniform-v1",
+  "source": "https://crayon-note.vercel.app/checklist.html",
+  "synced_at": "2026-09-15T03:52:30.577668+00:00",
+  "items": [
     {
-      "id": "195096",
-      "name": "乌洛斯",
-      "source_name": "乌洛斯/Uros",
-      "image": "195096.png",
-      "source_image": "https://cdnimg-v2.gamekee.com/wiki2.0/images/w_252/h_252/50206/686206/2025/8/25/797693.png"
+      "id": "Barie",
+      "name": "芭莉耶",
+      "image": "Barie.png",
+      "personality": "憂鬱",
+      "race": "魔女"
     },
     {
-      "id": "172967",
-      "name": "兰",
-      "source_name": "兰/Ran",
-      "image": "172967.png",
-      "source_image": "https://cdnimg-v2.gamekee.com/wiki2.0/images/w_252/h_252/50206/461425/2025/0/2/687649.png"
+      "id": "Sherum",
+      "name": "雪蘭",
+      "image": "Sherum.png",
+      "personality": "天真",
+      "race": "魔女"
     },
     {
-      "id": "134590",
-      "name": "薇薇",
-      "source_name": "薇薇/Vivi",
-      "image": "134590.png",
-      "source_image": "https://cdnimg-v2.gamekee.com/wiki2.0/images/w_252/h_252/50206/447913/2024/0/14/154613.png"
+      "id": "Pira",
+      "name": "琵拉",
+      "image": "Pira.png",
+      "personality": "狂亂",
+      "race": "龍族"
     },
     {
-      "id": "211964",
-      "name": "埃尔芬（王道）",
-      "source_name": "埃尔芬（王道）/ErpinRolyale",
-      "image": "211964.png",
-      "source_image": "https://cdnimg-v2.gamekee.com/wiki2.0/images/w_252/h_252/50206/686206/2026/3/2/349374.png"
+      "id": "Rollett",
+      "name": "羅蕾特",
+      "image": "Rollett.png",
+      "personality": "狂亂",
+      "race": "魔女"
     },
     {
-      "id": "163955",
-      "name": "莎伦",
-      "source_name": "莎伦/Sherum",
-      "image": "163955.png",
-      "source_image": "https://cdnimg-v2.gamekee.com/wiki2.0/images/w_252/h_252/50206/461425/2024/8/12/629748.png"
-    },
-    {
-      "id": "152341",
-      "name": "海莉",
-      "source_name": "海莉/Haley",
-      "image": "152341.png",
-      "source_image": "https://cdnimg-v2.gamekee.com/wiki2.0/images/w_252/h_252/50206/438074/2024/6/4/236101.png"
-    },
-    {
-      "id": "132250",
-      "name": "奈亚",
-      "source_name": "奈亚/Naia",
-      "image": "132250.png",
-      "source_image": "https://cdnimg-v2.gamekee.com/wiki2.0/images/w_252/h_252/50206/447913/2024/0/14/513815.png"
-    },
-    {
-      "id": "148729",
-      "name": "卡萝特",
-      "source_name": "卡萝特/Kyarot",
-      "image": "148729.png",
-      "source_image": "https://cdnimg-v2.gamekee.com/wiki2.0/images/w_252/h_252/50206/461425/2024/3/29/156056.png"
-    },
-    {
-      "id": "127944",
-      "name": "达雅",
-      "source_name": "达雅/Daya",
-      "image": "127944.png",
-      "source_image": "https://cdnimg-v2.gamekee.com/wiki2.0/images/w_252/h_252/50206/447913/2024/0/14/759880.png"
-    },
-    {
-      "id": "127928",
-      "name": "埃尔芬",
-      "source_name": "埃尔芬/Erpin",
-      "image": "127928.png",
-      "source_image": "https://cdnimg-v2.gamekee.com/wiki2.0/images/w_252/h_252/50206/447913/2024/0/14/432334.png"
-    },
-    {
-      "id": "172004",
-      "name": "欧珀",
-      "source_name": "欧珀/Opal",
-      "image": "172004.png",
-      "source_image": "https://cdnimg-v2.gamekee.com/wiki2.0/images/w_252/h_252/50206/461425/2024/11/19/270706.png"
-    },
-    {
-      "id": "178395",
-      "name": "莱卡",
-      "source_name": "莱卡/Laika",
-      "image": "178395.png",
-      "source_image": "https://cdnimg-v2.gamekee.com/wiki2.0/images/w_252/h_252/50206/461425/2025/2/13/623761.png"
-    },
-    {
-      "id": "185551",
-      "name": "玛约(超帅)",
-      "source_name": "玛约(超帅)/Mayo(Cool)",
-      "image": "185551.png",
-      "source_image": "https://cdnimg-v2.gamekee.com/wiki2.0/images/w_252/h_252/50206/686206/2025/4/8/805076.png"
-    },
-    {
-      "id": "190029",
-      "name": "凯茜",
-      "source_name": "凯茜/kathy",
-      "image": "190029.png",
-      "source_image": "https://cdnimg-v2.gamekee.com/wiki2.0/images/w_252/h_252/50206/686206/2025/6/3/420417.png"
-    },
-    {
-      "id": "194383",
-      "name": "穆特",
-      "source_name": "穆特/Mute",
-      "image": "194383.png",
-      "source_image": "https://cdnimg-v2.gamekee.com/wiki2.0/images/w_252/h_252/50206/686206/2025/8/11/505962.png"
-    },
-    {
-      "id": "200797",
-      "name": "阿依拉",
-      "source_name": "阿依拉/Ayla",
-      "image": "200797.png",
-      "source_image": "https://cdnimg-v2.gamekee.com/wiki2.0/images/w_252/h_252/50206/686206/2025/11/18/363202.png"
-    },
-    {
-      "id": "210756",
-      "name": "黛莉娅",
-      "source_name": "黛莉娅/Delia",
-      "image": "210756.png",
-      "source_image": "https://cdnimg-v2.gamekee.com/wiki2.0/images/w_252/h_252/50206/686206/2026/2/12/399656.png"
-    },
-    {
-      "id": "216579",
-      "name": "伊德（康复）",
-      "source_name": "伊德（康复）",
-      "image": "216579.png",
-      "source_image": "https://cdnimg-v2.gamekee.com/wiki2.0/pro/50206/images/w_252/h_252/50206/686206/2026/4/21/1779341640694_1779341632842_gpt3ot4rpa_d23wna51qg.png"
-    },
-    {
-      "id": "221024",
-      "name": "斯帕洛特",
-      "source_name": "斯帕洛特/Sparrot",
-      "image": "221024.png",
-      "source_image": "https://cdnimg-v2.gamekee.com/wiki2.0/pro/50206/images/w_252/h_252/686206/2026/7/13/21202818msre24we.png"
-    },
-    {
-      "id": "188892",
-      "name": "黛安娜（往昔）",
-      "source_name": "黛安娜（往昔）/Diana(Yester)",
-      "image": "188892.png",
-      "source_image": "https://cdnimg-v2.gamekee.com/wiki2.0/images/w_252/h_252/50206/686206/2025/5/5/901385.png"
-    },
-    {
-      "id": "146797",
-      "name": "伊德",
-      "source_name": "伊德/Ed",
-      "image": "146797.png",
-      "source_image": "https://cdnimg-v2.gamekee.com/wiki2.0/images/w_252/h_252/50206/447913/2024/2/28/604374.png"
-    },
-    {
-      "id": "127909",
-      "name": "绫",
-      "source_name": "绫/Aya",
-      "image": "127909.png",
-      "source_image": "https://cdnimg-v2.gamekee.com/wiki2.0/images/w_252/h_252/50206/447913/2024/0/14/54963.png"
-    },
-    {
-      "id": "163903",
-      "name": "巴隆",
-      "source_name": "巴隆/Barong",
-      "image": "163903.png",
-      "source_image": "https://cdnimg-v2.gamekee.com/wiki2.0/images/w_252/h_252/50206/461425/2024/8/12/219935.png"
-    },
-    {
-      "id": "127943",
-      "name": "薇尔薇特",
-      "source_name": "薇尔薇特/Velvet",
-      "image": "127943.png",
-      "source_image": "https://cdnimg-v2.gamekee.com/wiki2.0/images/w_252/h_252/50206/447913/2024/0/14/683776.png"
-    },
-    {
-      "id": "130957",
-      "name": "柯米(泳装)",
-      "source_name": "柯米(泳装)/KommySwim",
-      "image": "130957.png",
-      "source_image": "https://cdnimg-v2.gamekee.com/wiki2.0/images/w_252/h_252/50206/438074/2024/5/6/492875.png"
-    },
-    {
-      "id": "127937",
-      "name": "芙莉克",
-      "source_name": "芙莉克/Fricle",
-      "image": "127937.png",
-      "source_image": "https://cdnimg-v2.gamekee.com/wiki2.0/images/w_252/h_252/50206/447913/2024/0/14/628561.png"
-    },
-    {
-      "id": "127932",
-      "name": "埃蕾娜",
-      "source_name": "埃蕾娜/Elena",
-      "image": "127932.png",
-      "source_image": "https://cdnimg-v2.gamekee.com/wiki2.0/images/w_252/h_252/50206/447913/2024/0/14/844888.png"
-    },
-    {
-      "id": "127938",
-      "name": "婕德",
-      "source_name": "婕德/Jade",
-      "image": "127938.png",
-      "source_image": "https://cdnimg-v2.gamekee.com/wiki2.0/images/w_252/h_252/50206/447913/2024/0/14/511230.png"
-    },
-    {
-      "id": "142706",
-      "name": "皮可拉",
-      "source_name": "皮可拉/Picora",
-      "image": "142706.png",
-      "source_image": "https://cdnimg-v2.gamekee.com/wiki2.0/images/w_252/h_252/50206/447913/2024/1/24/108910.png"
-    },
-    {
-      "id": "127933",
-      "name": "艾蜜莉雅",
-      "source_name": "艾蜜莉雅/Amelia",
-      "image": "127933.png",
-      "source_image": "https://cdnimg-v2.gamekee.com/wiki2.0/images/w_252/h_252/50206/447913/2024/0/14/101738.png"
-    },
-    {
-      "id": "127934",
-      "name": "梅芦娜",
-      "source_name": "梅芦娜/Meluna",
-      "image": "127934.png",
-      "source_image": "https://cdnimg-v2.gamekee.com/wiki2.0/images/w_252/h_252/50206/447913/2024/0/14/352949.png"
-    },
-    {
-      "id": "127911",
-      "name": "希拉",
-      "source_name": "希拉/Sylla",
-      "image": "127911.png",
-      "source_image": "https://cdnimg-v2.gamekee.com/wiki2.0/images/w_252/h_252/50206/447913/2024/0/14/804871.png"
-    },
-    {
-      "id": "168276",
-      "name": "格温",
-      "source_name": "格温/Guin",
-      "image": "168276.png",
-      "source_image": "https://cdnimg-v2.gamekee.com/wiki2.0/images/w_252/h_252/50206/461425/2024/9/24/441463.png"
-    },
-    {
-      "id": "174507",
-      "name": "艾西亚",
-      "source_name": "艾西亚/eisia",
-      "image": "174507.png",
-      "source_image": "https://cdnimg-v2.gamekee.com/wiki2.0/images/w_252/h_252/50206/461425/2025/0/30/202179.png"
-    },
-    {
-      "id": "183609",
-      "name": "里科塔",
-      "source_name": "里科塔/ricotta",
-      "image": "183609.png",
-      "source_image": "https://cdnimg-v2.gamekee.com/wiki2.0/images/w_252/h_252/50206/686206/2025/3/24/606413.png"
-    },
-    {
-      "id": "193619",
-      "name": "凯撒",
-      "source_name": "凯撒/Scizor",
-      "image": "193619.png",
-      "source_image": "https://cdnimg-v2.gamekee.com/wiki2.0/images/w_252/h_252/50206/686206/2025/7/28/852979.png"
-    },
-    {
-      "id": "198381",
-      "name": "班尼（班尼）",
-      "source_name": "班尼（班尼）/BeniBeni",
-      "image": "198381.png",
-      "source_image": "https://cdnimg-v2.gamekee.com/wiki2.0/images/w_252/h_252/50206/686206/2025/10/20/398140.png"
-    },
-    {
-      "id": "205089",
-      "name": "尹可",
-      "source_name": "尹可/inkle",
-      "image": "205089.png",
-      "source_image": "https://cdnimg-v2.gamekee.com/wiki2.0/images/w_252/h_252/50206/686206/2026/1/13/45406.png"
-    },
-    {
-      "id": "213864",
-      "name": "阿拉戈尼娅",
-      "source_name": "阿拉戈尼娅/Aragnia",
-      "image": "213864.png",
-      "source_image": "https://cdnimg-v2.gamekee.com/wiki2.0/images/w_252/h_252/50206/686206/2026/3/23/664292.png"
-    },
-    {
-      "id": "218880",
-      "name": "妮可",
-      "source_name": "妮可/Nicole",
-      "image": "218880.png",
-      "source_image": "https://cdnimg-v2.gamekee.com/wiki2.0/pro/50206/images/w_252/h_252/686206/2026/6/30/08476549ms7cptjo.png"
-    },
-    {
-      "id": "217649",
-      "name": "西尔维娅",
-      "source_name": "西尔维娅/Silvia",
-      "image": "217649.png",
-      "source_image": "https://cdnimg-v2.gamekee.com/wiki2.0/pro/50206/images/w_252/h_252/686206/2026/5/18/93604652mqjj7ziw.png"
-    },
-    {
-      "id": "195097",
-      "name": "提格（英雄）",
-      "source_name": "提格（英雄）/Tig",
-      "image": "195097.png",
-      "source_image": "https://cdnimg-v2.gamekee.com/wiki2.0/images/w_252/h_252/50206/686206/2025/8/25/891309.png"
-    },
-    {
-      "id": "151523",
-      "name": "莉纽阿",
-      "source_name": "莉纽阿/Renewa",
-      "image": "151523.png",
-      "source_image": "https://cdnimg-v2.gamekee.com/wiki2.0/images/w_252/h_252/50206/438074/2024/5/21/372132.png"
-    },
-    {
-      "id": "127910",
-      "name": "克萝伊",
-      "source_name": "克萝伊/Chloe",
-      "image": "127910.png",
-      "source_image": "https://cdnimg-v2.gamekee.com/wiki2.0/images/w_252/h_252/50206/447913/2024/0/14/621938.png"
-    },
-    {
-      "id": "141848",
-      "name": "丽兹",
-      "source_name": "丽兹/Leets",
-      "image": "141848.png",
-      "source_image": "https://cdnimg-v2.gamekee.com/wiki2.0/images/w_252/h_252/50206/447913/2024/1/9/805046.png"
-    },
-    {
-      "id": "127930",
-      "name": "夏迪",
-      "source_name": "夏迪/Shady",
-      "image": "127930.png",
-      "source_image": "https://cdnimg-v2.gamekee.com/wiki2.0/images/w_252/h_252/50206/447913/2024/0/14/143737.png"
-    },
-    {
-      "id": "127940",
-      "name": "尼尔",
-      "source_name": "尼尔/Ner",
-      "image": "127940.png",
-      "source_image": "https://cdnimg-v2.gamekee.com/wiki2.0/images/w_252/h_252/50206/447913/2024/0/14/981700.png"
-    },
-    {
-      "id": "139672",
-      "name": "爱丽丝",
-      "source_name": "爱丽丝/Alice",
-      "image": "139672.png",
-      "source_image": "https://cdnimg-v2.gamekee.com/wiki2.0/images/w_252/h_252/50206/447913/2024/0/25/230972.png"
-    },
-    {
-      "id": "127912",
-      "name": "黛安娜",
-      "source_name": "黛安娜/Diana",
-      "image": "127912.png",
-      "source_image": "https://cdnimg-v2.gamekee.com/wiki2.0/images/w_252/h_252/50206/447913/2024/0/14/50304.png"
-    },
-    {
-      "id": "127945",
-      "name": "茜斯特",
-      "source_name": "茜斯特/Sist",
-      "image": "127945.png",
-      "source_image": "https://cdnimg-v2.gamekee.com/wiki2.0/images/w_252/h_252/50206/461425/2024/1/17/422360.png"
-    },
-    {
-      "id": "127946",
-      "name": "贝丽塔",
-      "source_name": "贝丽塔/Belita",
-      "image": "127946.png",
-      "source_image": "https://cdnimg-v2.gamekee.com/wiki2.0/images/w_252/h_252/50206/447913/2024/0/14/311448.png"
-    },
-    {
-      "id": "149034",
-      "name": "罗莱特",
-      "source_name": "罗莱特/Rollett",
-      "image": "149034.png",
-      "source_image": "https://cdnimg-v2.gamekee.com/wiki2.0/images/w_252/h_252/50206/461425/2024/4/9/370146.png"
-    },
-    {
-      "id": "163912",
-      "name": "皮拉",
-      "source_name": "皮拉/Pira",
-      "image": "163912.png",
-      "source_image": "https://cdnimg-v2.gamekee.com/wiki2.0/images/w_252/h_252/50206/461425/2024/8/12/916235.png"
-    },
-    {
-      "id": "169266",
-      "name": "破朗",
-      "source_name": "破朗/Polan",
-      "image": "169266.png",
-      "source_image": "https://cdnimg-v2.gamekee.com/wiki2.0/images/w_252/h_252/50206/461425/2024/10/7/568196.png"
-    },
-    {
-      "id": "173866",
-      "name": "混沌琳",
-      "source_name": "混沌琳/RimChaos",
-      "image": "173866.png",
-      "source_image": "https://cdnimg-v2.gamekee.com/wiki2.0/images/w_252/h_252/50206/461425/2025/0/17/678518.png"
-    },
-    {
-      "id": "181540",
-      "name": "内蒂",
-      "source_name": "内蒂/Neti",
-      "image": "181540.png",
-      "source_image": "https://cdnimg-v2.gamekee.com/wiki2.0/images/w_252/h_252/50206/461425/2025/3/10/683512.png"
-    },
-    {
-      "id": "191379",
-      "name": "阿妮特",
-      "source_name": "阿妮特/Arnet",
-      "image": "191379.png",
-      "source_image": "https://cdnimg-v2.gamekee.com/wiki2.0/images/w_252/h_252/50206/686206/2025/6/17/396954.png"
-    },
-    {
-      "id": "199270",
-      "name": "海蒂",
-      "source_name": "海蒂/Heidi",
-      "image": "199270.png",
-      "source_image": "https://cdnimg-v2.gamekee.com/wiki2.0/images/w_252/h_252/50206/686206/2025/11/4/466258.png"
-    },
-    {
-      "id": "204293",
-      "name": "达雅（纯真闪耀）",
-      "source_name": "达雅（纯真闪耀）/DayaPureShine",
-      "image": "204293.png",
-      "source_image": "https://cdnimg-v2.gamekee.com/wiki2.0/images/w_252/h_252/50206/686206/2026/0/29/915694.png"
-    },
-    {
-      "id": "213098",
-      "name": "海莉（清醒）",
-      "source_name": "海莉（清醒）/HaleySane",
-      "image": "213098.png",
-      "source_image": "https://cdnimg-v2.gamekee.com/wiki2.0/images/w_252/h_252/50206/686206/2026/3/9/266153.png"
-    },
-    {
-      "id": "218144",
-      "name": "斯琪娅",
-      "source_name": "斯琪娅/skea",
-      "image": "218144.png",
-      "source_image": "https://cdnimg-v2.gamekee.com/wiki2.0/pro/50206/images/w_252/h_252/686206/2026/6/2/15921076mr2dhali.png"
-    },
-    {
-      "id": "224812",
-      "name": "罗尼",
-      "source_name": "罗尼/Ronnie",
-      "image": "224812.png",
-      "source_image": "https://cdnimg-v2.gamekee.com/wiki2.0/pro/50206/images/w_252/h_252/686206/2026/8/10/99599802mtvc495x.png"
-    },
-    {
-      "id": "179625",
-      "name": "贝拉",
-      "source_name": "贝拉/Vela",
-      "image": "179625.png",
-      "source_image": "https://cdnimg-v2.gamekee.com/wiki2.0/images/w_252/h_252/50206/461425/2025/2/27/860569.png"
-    },
-    {
-      "id": "137565",
-      "name": "埃皮卡",
-      "source_name": "埃皮卡/Epica",
-      "image": "137565.png",
-      "source_image": "https://cdnimg-v2.gamekee.com/wiki2.0/images/w_252/h_252/50206/447913/2024/0/14/361586.png"
-    },
-    {
-      "id": "127888",
-      "name": "雨伊",
-      "source_name": "雨伊/Ui",
-      "image": "127888.png",
-      "source_image": "https://cdnimg-v2.gamekee.com/wiki2.0/images/w_252/h_252/50206/447913/2024/0/14/996541.png"
-    },
-    {
-      "id": "211965",
-      "name": "涅尔（义愤）",
-      "source_name": "涅尔（义愤）/NerRage",
-      "image": "211965.png",
-      "source_image": "https://cdnimg-v2.gamekee.com/wiki2.0/images/w_252/h_252/50206/686206/2026/3/2/924121.png"
-    },
-    {
-      "id": "130314",
-      "name": "提格",
-      "source_name": "提格/Tig",
-      "image": "130314.png",
-      "source_image": "https://cdnimg-v2.gamekee.com/wiki2.0/images/w_252/h_252/50206/447913/2024/0/14/246200.png"
-    },
-    {
-      "id": "136552",
-      "name": "赛琳娜",
-      "source_name": "赛琳娜/Selline",
-      "image": "136552.png",
-      "source_image": "https://cdnimg-v2.gamekee.com/wiki2.0/images/w_252/h_252/50206/447913/2024/0/14/50708.png"
-    },
-    {
-      "id": "127936",
-      "name": "鲁德",
-      "source_name": "鲁德/Rude",
-      "image": "127936.png",
-      "source_image": "https://cdnimg-v2.gamekee.com/wiki2.0/images/w_252/h_252/50206/447913/2024/0/14/19685.png"
-    },
-    {
-      "id": "127939",
-      "name": "卢波",
-      "source_name": "卢波/Rufo",
-      "image": "127939.png",
-      "source_image": "https://cdnimg-v2.gamekee.com/wiki2.0/images/w_252/h_252/50206/447913/2024/0/14/207230.png"
-    },
-    {
-      "id": "147563",
-      "name": "舒胖",
-      "source_name": "舒胖/Shoupan",
-      "image": "147563.png",
-      "source_image": "https://cdnimg-v2.gamekee.com/wiki2.0/images/w_252/h_252/50206/447913/2024/3/12/704463.png"
-    },
-    {
-      "id": "153893",
-      "name": "小桃",
-      "source_name": "小桃/Momo",
-      "image": "153893.png",
-      "source_image": "https://cdnimg-v2.gamekee.com/wiki2.0/images/w_252/h_252/50206/438074/2024/6/19/508129.png"
-    },
-    {
-      "id": "127947",
-      "name": "黄油",
-      "source_name": "黄油/Butter",
-      "image": "127947.png",
-      "source_image": "https://cdnimg-v2.gamekee.com/wiki2.0/images/w_252/h_252/50206/447913/2024/0/14/602558.png"
-    },
-    {
-      "id": "127941",
-      "name": "康娜",
-      "source_name": "康娜/Canna",
-      "image": "127941.png",
-      "source_image": "https://cdnimg-v2.gamekee.com/wiki2.0/images/w_252/h_252/50206/447913/2024/0/14/776111.png"
-    },
-    {
-      "id": "170006",
-      "name": "斯碧琪（女仆）",
-      "source_name": "斯碧琪（女仆）/Speaki",
-      "image": "170006.png",
-      "source_image": "https://cdnimg-v2.gamekee.com/wiki2.0/images/w_252/h_252/50206/461425/2024/10/21/23312.png"
-    },
-    {
-      "id": "176914",
-      "name": "修罗",
-      "source_name": "修罗/Suro",
-      "image": "176914.png",
-      "source_image": "https://cdnimg-v2.gamekee.com/wiki2.0/images/w_252/h_252/50206/461425/2025/1/27/676767.png"
-    },
-    {
-      "id": "189451",
-      "name": "阿尔柯",
-      "source_name": "阿尔柯/Arco",
-      "image": "189451.png",
-      "source_image": "https://cdnimg-v2.gamekee.com/wiki2.0/images/w_252/h_252/50206/686206/2025/5/20/48567.png"
-    },
-    {
-      "id": "193223",
-      "name": "玛卡莎",
-      "source_name": "玛卡莎/Makasha",
-      "image": "193223.png",
-      "source_image": "https://cdnimg-v2.gamekee.com/wiki2.0/images/w_252/h_252/50206/686206/2025/7/14/373241.png"
-    },
-    {
-      "id": "196835",
-      "name": "米洛",
-      "source_name": "米洛/Miro",
-      "image": "196835.png",
-      "source_image": "https://cdnimg-v2.gamekee.com/wiki2.0/images/w_252/h_252/50206/686206/2025/9/24/473716.png"
-    },
-    {
-      "id": "203229",
-      "name": "夏迪（逆转）",
-      "source_name": "夏迪（逆转）/ShadyTwisted",
-      "image": "203229.png",
-      "source_image": "https://cdnimg-v2.gamekee.com/wiki2.0/images/w_252/h_252/50206/686206/2026/0/15/295659.png"
-    },
-    {
-      "id": "214776",
-      "name": "莱薇（毕业）",
-      "source_name": "莱薇（毕业）/LeviGraduate",
-      "image": "214776.png",
-      "source_image": "https://cdnimg-v2.gamekee.com/wiki2.0/pro/50206/images/w_252/h_252/50206/686206/2026/4/7/874690.png"
-    },
-    {
-      "id": "219950",
-      "name": "艾舒尔（魔道）",
-      "source_name": "艾舒尔（魔道）/AshurMagi",
-      "image": "219950.png",
-      "source_image": "https://cdnimg-v2.gamekee.com/wiki2.0/pro/50206/images/w_252/h_252/686206/2026/6/30/54335748ms7cpxat.png"
-    },
-    {
-      "id": "202252",
-      "name": "优米",
-      "source_name": "优米/yomi",
-      "image": "202252.png",
-      "source_image": "https://cdnimg-v2.gamekee.com/wiki2.0/images/w_252/h_252/50206/686206/2026/0/1/469736.png"
-    },
-    {
-      "id": "155603",
-      "name": "琼安",
-      "source_name": "琼安/Joanne",
-      "image": "155603.png",
-      "source_image": "https://cdnimg-v2.gamekee.com/wiki2.0/images/w_252/h_252/50206/461425/2024/8/26/228088.png"
-    },
-    {
-      "id": "127889",
-      "name": "x锡安x",
-      "source_name": "x锡安x/xXionx",
-      "image": "127889.png",
-      "source_image": "https://cdnimg-v2.gamekee.com/wiki2.0/images/w_252/h_252/50206/447913/2024/0/14/294347.png"
-    },
-    {
-      "id": "127887",
-      "name": "柯米",
-      "source_name": "柯米/Kommy",
-      "image": "127887.png",
-      "source_image": "https://cdnimg-v2.gamekee.com/wiki2.0/images/w_252/h_252/50206/447913/2024/0/14/548817.png"
-    },
-    {
-      "id": "127931",
-      "name": "基迪恩",
-      "source_name": "基迪恩/Kidian",
-      "image": "127931.png",
-      "source_image": "https://cdnimg-v2.gamekee.com/wiki2.0/images/w_252/h_252/50206/447913/2024/0/14/432421.png"
-    },
-    {
-      "id": "163913",
-      "name": "斯诺琪",
-      "source_name": "斯诺琪/Snorky",
-      "image": "163913.png",
-      "source_image": "https://cdnimg-v2.gamekee.com/wiki2.0/images/w_252/h_252/50206/461425/2024/8/12/170560.png"
-    },
-    {
-      "id": "127935",
-      "name": "琳",
-      "source_name": "琳/Rim",
-      "image": "127935.png",
-      "source_image": "https://cdnimg-v2.gamekee.com/wiki2.0/images/w_252/h_252/50206/447913/2024/0/14/885695.png"
-    },
-    {
-      "id": "145076",
-      "name": "布蓝琪",
-      "source_name": "布蓝琪/Blanchet",
-      "image": "145076.png",
-      "source_image": "https://cdnimg-v2.gamekee.com/wiki2.0/images/w_252/h_252/50206/447913/2024/2/16/468383.png"
-    },
-    {
-      "id": "135997",
-      "name": "希尔德",
-      "source_name": "希尔德/Hilde",
-      "image": "135997.png",
-      "source_image": "https://cdnimg-v2.gamekee.com/wiki2.0/images/w_252/h_252/50206/447913/2024/0/14/619908.png"
-    },
-    {
-      "id": "127929",
-      "name": "珀榭",
-      "source_name": "珀榭/Posher",
-      "image": "127929.png",
-      "source_image": "https://cdnimg-v2.gamekee.com/wiki2.0/images/w_252/h_252/50206/447913/2024/0/14/250926.png"
-    },
-    {
-      "id": "127942",
-      "name": "艾舒尔",
-      "source_name": "艾舒尔/Ashur",
-      "image": "127942.png",
-      "source_image": "https://cdnimg-v2.gamekee.com/wiki2.0/images/w_252/h_252/50206/447913/2024/0/14/306674.png"
-    },
-    {
-      "id": "136283",
-      "name": "莉斯缇",
-      "source_name": "莉斯缇/Risty",
-      "image": "136283.png",
-      "source_image": "https://cdnimg-v2.gamekee.com/wiki2.0/images/w_252/h_252/50206/447838/2024/4/23/617070.png"
-    },
-    {
-      "id": "170788",
-      "name": "里昂",
-      "source_name": "里昂/Lion",
-      "image": "170788.png",
-      "source_image": "https://cdnimg-v2.gamekee.com/wiki2.0/images/w_252/h_252/50206/461425/2024/11/5/129600.png"
-    },
-    {
-      "id": "175938",
-      "name": "夏夏",
-      "source_name": "夏夏/Shasha",
-      "image": "175938.png",
-      "source_image": "https://cdnimg-v2.gamekee.com/wiki2.0/images/w_252/h_252/50206/461425/2025/1/14/680871.png"
-    },
-    {
-      "id": "187640",
-      "name": "欧尔",
-      "source_name": "欧尔/Orr",
-      "image": "187640.png",
-      "source_image": "https://cdnimg-v2.gamekee.com/wiki2.0/images/w_252/h_252/50206/686206/2025/4/22/822373.png"
-    },
-    {
-      "id": "192065",
-      "name": "洛涅（市长）",
-      "source_name": "洛涅（市长）/Rohne",
-      "image": "192065.png",
-      "source_image": "https://cdnimg-v2.gamekee.com/wiki2.0/images/w_252/h_252/50206/686206/2025/6/31/790806.png"
-    },
-    {
-      "id": "197629",
-      "name": "阿萨娜",
-      "source_name": "阿萨娜/Asana",
-      "image": "197629.png",
-      "source_image": "https://cdnimg-v2.gamekee.com/wiki2.0/images/w_252/h_252/50206/686206/2025/10/6/902494.png"
-    },
-    {
-      "id": "208222",
-      "name": "艾蜜莉雅（R41）",
-      "source_name": "艾蜜莉雅（R41）/AmeliaR41",
-      "image": "208222.png",
-      "source_image": "https://cdnimg-v2.gamekee.com/wiki2.0/images/w_252/h_252/50206/686206/2026/1/26/258990.png"
-    },
-    {
-      "id": "216985",
-      "name": "绮莎",
-      "source_name": "绮莎/Kishya",
-      "image": "216985.png",
-      "source_image": "https://cdnimg-v2.gamekee.com/wiki2.0/pro/50206/images/w_252/h_252/50206/686206/2026/5/4/1780576727670_1780568405318_oaihlr6wyk_lfr5zakhlf.png"
-    },
-    {
-      "id": "221750",
-      "name": "欧若拉",
-      "source_name": "欧若拉/Aurora",
-      "image": "221750.png",
-      "source_image": "https://cdnimg-v2.gamekee.com/wiki2.0/pro/50206/images/w_252/h_252/686206/2026/7/27/85097018mtbcey52.png"
-    }
-  ],
-  "two_star": [
-    {
-      "id": "153895",
-      "name": "大木头",
-      "source_name": "大木头/BigWood",
-      "image": "153895.png",
-      "source_image": "https://cdnimg-v2.gamekee.com/wiki2.0/images/w_252/h_252/50206/438074/2024/6/14/27754.png"
-    },
-    {
-      "id": "127956",
+      "id": "Rohne",
       "name": "洛涅",
-      "source_name": "洛涅/Rohne",
-      "image": "127956.png",
-      "source_image": "https://cdnimg-v2.gamekee.com/wiki2.0/images/w_252/h_252/50206/447913/2024/0/13/916241.png"
+      "image": "Rohne.png",
+      "personality": "天真",
+      "race": "精靈"
     },
     {
-      "id": "127955",
-      "name": "加维亚",
-      "source_name": "加维亚/Gabia",
-      "image": "127955.png",
-      "source_image": "https://cdnimg-v2.gamekee.com/wiki2.0/images/w_252/h_252/50206/447913/2024/0/13/519750.png"
+      "id": "Vivi",
+      "name": "薇薇",
+      "image": "Vivi.png",
+      "personality": "天真",
+      "race": "龍族"
     },
     {
-      "id": "127957",
-      "name": "玛戈",
-      "source_name": "玛戈/Mago",
-      "image": "127957.png",
-      "source_image": "https://cdnimg-v2.gamekee.com/wiki2.0/images/w_252/h_252/50206/447913/2024/0/13/241880.png"
+      "id": "Kyarot",
+      "name": "卡洛特",
+      "image": "Kyarot.png",
+      "personality": "天真",
+      "race": "妖精"
     },
     {
-      "id": "127958",
-      "name": "斯碧琪",
-      "source_name": "斯碧琪/Speaki",
-      "image": "127958.png",
-      "source_image": "https://cdnimg-v2.gamekee.com/wiki2.0/images/w_252/h_252/50206/447913/2024/0/13/239459.png"
+      "id": "Naia",
+      "name": "奈雅",
+      "image": "Naia.png",
+      "personality": "天真",
+      "race": "魔靈"
     },
     {
-      "id": "153894",
-      "name": "勒忒",
-      "source_name": "勒忒/Lethe",
-      "image": "153894.png",
-      "source_image": "https://cdnimg-v2.gamekee.com/wiki2.0/images/w_252/h_252/50206/438074/2024/6/4/269776.png"
+      "id": "Erpin",
+      "name": "艾爾芬",
+      "image": "Erpin.png",
+      "personality": "天真",
+      "race": "妖精"
     },
     {
-      "id": "127962",
-      "name": "埃斯皮",
-      "source_name": "埃斯皮/Espi",
-      "image": "127962.png",
-      "source_image": "https://cdnimg-v2.gamekee.com/wiki2.0/images/w_252/h_252/50206/447913/2024/0/13/306275.png"
+      "id": "Mago",
+      "name": "馬爾",
+      "image": "Mago.png",
+      "personality": "天真",
+      "race": "獸人"
     },
     {
-      "id": "163956",
-      "name": "康塔",
-      "source_name": "康塔/Canta",
-      "image": "163956.png",
-      "source_image": "https://cdnimg-v2.gamekee.com/wiki2.0/images/w_252/h_252/50206/461425/2024/8/12/913973.png"
+      "id": "Gabia",
+      "name": "加薇雅",
+      "image": "Gabia.png",
+      "personality": "天真",
+      "race": "魔靈"
     },
     {
-      "id": "127959",
-      "name": "大师2号",
-      "source_name": "大师2号/MaestroMK2",
-      "image": "127959.png",
-      "source_image": "https://cdnimg-v2.gamekee.com/wiki2.0/images/w_252/h_252/50206/447913/2024/0/13/626339.png"
+      "id": "Silphir",
+      "name": "希菲爾",
+      "image": "Silphir.png",
+      "personality": "天真",
+      "race": "龍族"
     },
     {
-      "id": "127961",
-      "name": "伊芙利特",
-      "source_name": "伊芙利特/Ifrit",
-      "image": "127961.png",
-      "source_image": "https://cdnimg-v2.gamekee.com/wiki2.0/images/w_252/h_252/50206/447913/2024/0/13/688492.png"
+      "id": "Speaki",
+      "name": "斯皮奇",
+      "image": "Speaki.png",
+      "personality": "天真",
+      "race": "幽靈"
     },
     {
-      "id": "127960",
-      "name": "玛约",
-      "source_name": "玛约/Mayo",
-      "image": "127960.png",
-      "source_image": "https://cdnimg-v2.gamekee.com/wiki2.0/images/w_252/h_252/50206/447913/2024/0/13/49459.png"
+      "id": "Haley",
+      "name": "海莉",
+      "image": "Haley.png",
+      "personality": "天真",
+      "race": "精靈"
     },
     {
-      "id": "127964",
-      "name": "班尼",
-      "source_name": "班尼/Beni",
-      "image": "127964.png",
-      "source_image": "https://cdnimg-v2.gamekee.com/wiki2.0/images/w_252/h_252/50206/447913/2024/0/13/267192.png"
+      "id": "BigWood",
+      "name": "大木頭",
+      "image": "BigWood.png",
+      "personality": "天真",
+      "race": "魔靈"
     },
     {
-      "id": "127963",
-      "name": "玛丽",
-      "source_name": "玛丽/Marie",
-      "image": "127963.png",
-      "source_image": "https://cdnimg-v2.gamekee.com/wiki2.0/images/w_252/h_252/50206/447913/2024/0/13/167718.png"
+      "id": "Allet",
+      "name": "阿萊特",
+      "image": "Allet.png",
+      "personality": "天真",
+      "race": "精靈"
     },
     {
-      "id": "127965",
-      "name": "茱比",
-      "source_name": "茱比/Jubee",
-      "image": "127965.png",
-      "source_image": "https://cdnimg-v2.gamekee.com/wiki2.0/images/w_252/h_252/50206/461425/2025/3/10/514877.png"
+      "id": "Sari",
+      "name": "莎莉",
+      "image": "Sari.png",
+      "personality": "天真",
+      "race": "幽靈"
     },
     {
-      "id": "149033",
-      "name": "芭娜",
-      "source_name": "芭娜/Bana",
-      "image": "149033.png",
-      "source_image": "https://cdnimg-v2.gamekee.com/wiki2.0/images/w_252/h_252/50206/461425/2024/4/9/513044.png"
-    },
-    {
-      "id": "127967",
-      "name": "菲斯塔",
-      "source_name": "菲斯塔/Festa",
-      "image": "127967.png",
-      "source_image": "https://cdnimg-v2.gamekee.com/wiki2.0/images/w_252/h_252/50206/447913/2024/0/13/552757.png"
-    },
-    {
-      "id": "127966",
-      "name": "莱薇",
-      "source_name": "莱薇/Levi",
-      "image": "127966.png",
-      "source_image": "https://cdnimg-v2.gamekee.com/wiki2.0/images/w_252/h_252/50206/447913/2024/0/13/147339.png"
-    },
-    {
-      "id": "132251",
-      "name": "希菲尔",
-      "source_name": "希菲尔/Silphir",
-      "image": "132251.png",
-      "source_image": "https://cdnimg-v2.gamekee.com/wiki2.0/images/w_252/h_252/50206/447913/2024/0/13/324544.png"
-    },
-    {
-      "id": "163904",
-      "name": "巴丽叶",
-      "source_name": "巴丽叶/Barie",
-      "image": "163904.png",
-      "source_image": "https://cdnimg-v2.gamekee.com/wiki2.0/images/w_252/h_252/50206/461425/2024/8/12/351478.png"
-    }
-  ],
-  "one_star": [
-    {
-      "id": "127969",
-      "name": "阿莱特",
-      "source_name": "阿莱特/Allet",
-      "image": "127969.png",
-      "source_image": "https://cdnimg-v2.gamekee.com/wiki2.0/images/w_252/h_252/50206/447913/2024/0/13/137489.png"
-    },
-    {
-      "id": "127968",
-      "name": "莎里",
-      "source_name": "莎里/Sari",
-      "image": "127968.png",
-      "source_image": "https://cdnimg-v2.gamekee.com/wiki2.0/images/w_252/h_252/50206/447913/2024/0/13/798112.png"
-    },
-    {
-      "id": "127970",
+      "id": "Cuee",
       "name": "路易",
-      "source_name": "路易/Cuee",
-      "image": "127970.png",
-      "source_image": "https://cdnimg-v2.gamekee.com/wiki2.0/images/w_252/h_252/50206/447913/2024/0/13/217659.png"
+      "image": "Cuee.png",
+      "personality": "天真",
+      "race": "妖精"
     },
     {
-      "id": "127974",
-      "name": "帕特拉",
-      "source_name": "帕特拉/Patula",
-      "image": "127974.png",
-      "source_image": "https://cdnimg-v2.gamekee.com/wiki2.0/images/w_252/h_252/50206/447913/2024/0/13/578684.png"
+      "id": "Shoupan",
+      "name": "修帕",
+      "image": "Shoupan.png",
+      "personality": "活潑",
+      "race": "妖精"
     },
     {
-      "id": "127973",
-      "name": "雷吉",
-      "source_name": "雷吉/Lazy",
-      "image": "127973.png",
-      "source_image": "https://cdnimg-v2.gamekee.com/wiki2.0/images/w_252/h_252/50206/447913/2024/0/13/990357.png"
+      "id": "Butter",
+      "name": "奶油",
+      "image": "Butter.png",
+      "personality": "活潑",
+      "race": "獸人"
     },
     {
-      "id": "127971",
-      "name": "美空",
-      "source_name": "美空/Maison",
-      "image": "127971.png",
-      "source_image": "https://cdnimg-v2.gamekee.com/wiki2.0/images/w_252/h_252/50206/447913/2024/0/13/188573.png"
+      "id": "Momo",
+      "name": "桃桃",
+      "image": "Momo.png",
+      "personality": "活潑",
+      "race": "獸人"
     },
     {
-      "id": "127972",
-      "name": "刘美美",
-      "source_name": "刘美美/Yumimi",
-      "image": "127972.png",
-      "source_image": "https://cdnimg-v2.gamekee.com/wiki2.0/images/w_252/h_252/50206/447913/2024/0/13/194181.png"
+      "id": "Selline",
+      "name": "瑟琳娜",
+      "image": "Selline.png",
+      "personality": "活潑",
+      "race": "幽靈"
     },
     {
-      "id": "127976",
+      "id": "Ui",
+      "name": "羽伊",
+      "image": "Ui.png",
+      "personality": "活潑",
+      "race": "魔靈"
+    },
+    {
+      "id": "Epica",
+      "name": "艾皮卡",
+      "image": "Epica.png",
+      "personality": "活潑",
+      "race": "獸人"
+    },
+    {
+      "id": "Rude",
+      "name": "路德",
+      "image": "Rude.png",
+      "personality": "活潑",
+      "race": "龍族"
+    },
+    {
+      "id": "Canna",
+      "name": "康娜",
+      "image": "Canna.png",
+      "personality": "活潑",
+      "race": "精靈"
+    },
+    {
+      "id": "Beni",
+      "name": "班尼",
+      "image": "Beni.png",
+      "personality": "活潑",
+      "race": "獸人"
+    },
+    {
+      "id": "Rufo",
+      "name": "盧波",
+      "image": "Rufo.png",
+      "personality": "活潑",
+      "race": "獸人"
+    },
+    {
+      "id": "Jubee",
+      "name": "茱蜜",
+      "image": "Jubee.png",
+      "personality": "活潑",
+      "race": "魔靈"
+    },
+    {
+      "id": "Carren",
+      "name": "卡蓮",
+      "image": "Carren.png",
+      "personality": "活潑",
+      "race": "妖精"
+    },
+    {
+      "id": "Taida",
+      "name": "泰達",
+      "image": "Taida.png",
+      "personality": "活潑",
+      "race": "精靈"
+    },
+    {
+      "id": "Marie",
+      "name": "瑪麗",
+      "image": "Marie.png",
+      "personality": "活潑",
+      "race": "妖精"
+    },
+    {
+      "id": "Mynx",
       "name": "米雪",
-      "source_name": "米雪/Mynx",
-      "image": "127976.png",
-      "source_image": "https://cdnimg-v2.gamekee.com/wiki2.0/images/w_252/h_252/50206/447913/2024/0/13/378993.png"
+      "image": "Mynx.png",
+      "personality": "活潑",
+      "race": "獸人"
     },
     {
-      "id": "127975",
-      "name": "卡伦",
-      "source_name": "卡伦/Carren",
-      "image": "127975.png",
-      "source_image": "https://cdnimg-v2.gamekee.com/wiki2.0/images/w_252/h_252/50206/447913/2024/0/13/240644.png"
+      "id": "Ed",
+      "name": "伊德",
+      "image": "Ed.png",
+      "personality": "冷靜",
+      "race": "精靈"
     },
     {
-      "id": "127977",
-      "name": "泰达",
-      "source_name": "泰达/Taida",
-      "image": "127977.png",
-      "source_image": "https://cdnimg-v2.gamekee.com/wiki2.0/images/w_252/h_252/50206/447913/2024/0/13/789813.png"
+      "id": "Elena",
+      "name": "艾琳娜",
+      "image": "Elena.png",
+      "personality": "冷靜",
+      "race": "精靈"
     },
     {
-      "id": "127978",
-      "name": "贝鲁",
-      "source_name": "贝鲁/Veroo",
-      "image": "127978.png",
-      "source_image": "https://cdnimg-v2.gamekee.com/wiki2.0/images/w_252/h_252/50206/447913/2024/0/13/913710.png"
+      "id": "Velvet",
+      "name": "佩佩",
+      "image": "Velvet.png",
+      "personality": "冷靜",
+      "race": "魔女"
     },
     {
-      "id": "127979",
-      "name": "乔菲",
-      "source_name": "乔菲/Chopi",
-      "image": "127979.png",
-      "source_image": "https://cdnimg-v2.gamekee.com/wiki2.0/images/w_252/h_252/50206/447913/2024/0/13/985707.png"
+      "id": "Sylla",
+      "name": "希拉",
+      "image": "Sylla.png",
+      "personality": "冷靜",
+      "race": "魔靈"
+    },
+    {
+      "id": "Picora",
+      "name": "皮可菈",
+      "image": "Picora.png",
+      "personality": "冷靜",
+      "race": "魔女"
+    },
+    {
+      "id": "Amelia",
+      "name": "艾蜜莉雅",
+      "image": "Amelia.png",
+      "personality": "冷靜",
+      "race": "精靈"
+    },
+    {
+      "id": "Fricle",
+      "name": "芙莉可",
+      "image": "Fricle.png",
+      "personality": "冷靜",
+      "race": "魔女"
+    },
+    {
+      "id": "Aya",
+      "name": "綾",
+      "image": "Aya.png",
+      "personality": "冷靜",
+      "race": "魔女"
+    },
+    {
+      "id": "Patula",
+      "name": "帕特拉",
+      "image": "Patula.png",
+      "personality": "冷靜",
+      "race": "妖精"
+    },
+    {
+      "id": "Meluna",
+      "name": "梅露娜",
+      "image": "Meluna.png",
+      "personality": "冷靜",
+      "race": "魔靈"
+    },
+    {
+      "id": "Jade",
+      "name": "傑德",
+      "image": "Jade.png",
+      "personality": "冷靜",
+      "race": "龍族"
+    },
+    {
+      "id": "Espi",
+      "name": "艾斯皮",
+      "image": "Espi.png",
+      "personality": "冷靜",
+      "race": "幽靈"
+    },
+    {
+      "id": "Lazy",
+      "name": "雷吉",
+      "image": "Lazy.png",
+      "personality": "冷靜",
+      "race": "精靈"
+    },
+    {
+      "id": "Mayo",
+      "name": "瑪約",
+      "image": "Mayo.png",
+      "personality": "狂亂",
+      "race": "妖精"
+    },
+    {
+      "id": "Leets",
+      "name": "莉茲",
+      "image": "Leets.png",
+      "personality": "狂亂",
+      "race": "龍族"
+    },
+    {
+      "id": "Shady",
+      "name": "謝蒂",
+      "image": "Shady.png",
+      "personality": "狂亂",
+      "race": "幽靈"
+    },
+    {
+      "id": "Chloe",
+      "name": "庫洛艾",
+      "image": "Chloe.png",
+      "personality": "狂亂",
+      "race": "妖精"
+    },
+    {
+      "id": "Alice",
+      "name": "愛麗絲",
+      "image": "Alice.png",
+      "personality": "狂亂",
+      "race": "幽靈"
+    },
+    {
+      "id": "Diana",
+      "name": "蒂亞娜",
+      "image": "Diana.png",
+      "personality": "狂亂",
+      "race": "獸人"
+    },
+    {
+      "id": "Belita",
+      "name": "貝麗塔",
+      "image": "Belita.png",
+      "personality": "狂亂",
+      "race": "魔女"
+    },
+    {
+      "id": "Sist",
+      "name": "希瑟圖",
+      "image": "Sist.png",
+      "personality": "狂亂",
+      "race": "龍族"
+    },
+    {
+      "id": "MaestroMK2",
+      "name": "大師2號",
+      "image": "MaestroMK2.png",
+      "personality": "狂亂",
+      "race": "精靈"
+    },
+    {
+      "id": "Maison",
+      "name": "梅森",
+      "image": "Maison.png",
+      "personality": "狂亂",
+      "race": "幽靈"
+    },
+    {
+      "id": "Ifrit",
+      "name": "伊弗利特",
+      "image": "Ifrit.png",
+      "personality": "狂亂",
+      "race": "魔靈"
+    },
+    {
+      "id": "Yumimi",
+      "name": "劉美美",
+      "image": "Yumimi.png",
+      "personality": "狂亂",
+      "race": "獸人"
+    },
+    {
+      "id": "xXionx",
+      "name": "x乂錫安乂x",
+      "image": "xXionx.png",
+      "personality": "憂鬱",
+      "race": "幽靈"
+    },
+    {
+      "id": "Kidian",
+      "name": "基狄恩",
+      "image": "Kidian.png",
+      "personality": "憂鬱",
+      "race": "龍族"
+    },
+    {
+      "id": "Blanchet",
+      "name": "布蘭切",
+      "image": "Blanchet.png",
+      "personality": "憂鬱",
+      "race": "魔靈"
+    },
+    {
+      "id": "Rim",
+      "name": "琳",
+      "image": "Rim.png",
+      "personality": "憂鬱",
+      "race": "幽靈"
+    },
+    {
+      "id": "Yomi",
+      "name": "優米",
+      "image": "Yomi.png",
+      "personality": "憂鬱",
+      "race": "???"
+    },
+    {
+      "id": "Hilde",
+      "name": "希爾德",
+      "image": "Hilde.png",
+      "personality": "憂鬱",
+      "race": "精靈"
+    },
+    {
+      "id": "Kommy",
+      "name": "柯米",
+      "image": "Kommy.png",
+      "personality": "憂鬱",
+      "race": "獸人"
+    },
+    {
+      "id": "Posher",
+      "name": "珀榭",
+      "image": "Posher.png",
+      "personality": "憂鬱",
+      "race": "魔女"
+    },
+    {
+      "id": "Ashur",
+      "name": "艾舒爾",
+      "image": "Ashur.png",
+      "personality": "憂鬱",
+      "race": "妖精"
+    },
+    {
+      "id": "Snorky",
+      "name": "斯諾奇",
+      "image": "Snorky.png",
+      "personality": "憂鬱",
+      "race": "魔女"
+    },
+    {
+      "id": "Veroo",
+      "name": "貝魯",
+      "image": "Veroo.png",
+      "personality": "憂鬱",
+      "race": "幽靈"
+    },
+    {
+      "id": "Festa",
+      "name": "佩斯塔",
+      "image": "Festa.png",
+      "personality": "憂鬱",
+      "race": "精靈"
+    },
+    {
+      "id": "Levi",
+      "name": "萊薇",
+      "image": "Levi.png",
+      "personality": "憂鬱",
+      "race": "魔女"
+    },
+    {
+      "id": "Chopi",
+      "name": "喬菲",
+      "image": "Chopi.png",
+      "personality": "憂鬱",
+      "race": "獸人"
+    },
+    {
+      "id": "Ner",
+      "name": "寧琉",
+      "image": "Ner.png",
+      "personality": "狂亂",
+      "race": "妖精"
+    },
+    {
+      "id": "Risty",
+      "name": "莉絲蒂",
+      "image": "Risty.png",
+      "personality": "憂鬱",
+      "race": "精靈"
+    },
+    {
+      "id": "RenewaAwaken",
+      "name": "雷內瓦",
+      "image": "RenewaAwaken.png",
+      "personality": "狂亂",
+      "race": "精靈"
+    },
+    {
+      "id": "Barong",
+      "name": "芭瓏",
+      "image": "Barong.png",
+      "personality": "冷靜",
+      "race": "幽靈"
+    },
+    {
+      "id": "Daya",
+      "name": "達雅",
+      "image": "Daya.png",
+      "personality": "天真",
+      "race": "龍族"
+    },
+    {
+      "id": "Tig",
+      "name": "提格",
+      "image": "Tig.png",
+      "personality": "活潑",
+      "race": "獸人"
     }
   ]
 }
