@@ -11,3 +11,10 @@ logs/*.log.*
 data/*.sqlite3
 data/*.sqlite3-shm
 data/*.sqlite3-wal
+data/*.lock
+build/
+dist/*
+!dist/ElenaBot.exe
+!dist/.env.example
+!dist/DEPLOY_WINDOWS.md
+*.spec

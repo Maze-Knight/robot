@@ -9,10 +9,10 @@ from collections.abc import Awaitable, Callable
 from dataclasses import dataclass, field
 from datetime import datetime
 from logging.handlers import RotatingFileHandler
-from pathlib import Path
 from typing import Any
 
 from config import ConfigurationError, Settings, load_settings
+from runtime import APP_DIR, AlreadyRunningError, InstanceLock
 
 
 BOT_NAME = "艾琳娜"
@@ -20,7 +20,7 @@ REPLY_TEXT = "艾琳娜收到啦！"
 TRIGGERS = {"测试", "ping"}
 MENU_TRIGGERS = {"菜单", "/help", "/menu"}
 MARKDOWN_TRIGGER = "/test-markdown"
-LOG_DIR = Path(__file__).resolve().parent / "logs"
+LOG_DIR = APP_DIR / "logs"
 logger = logging.getLogger("elena.qq")
 
 ReplyFunction = Callable[[str], Awaitable[dict[str, Any]]]
@@ -270,7 +270,7 @@ async def run_bot(settings: Settings) -> None:
         terminal_status = TerminalStatus()
         menus = MenuService(api, terminal_status)
         steam_repository = SteamRepository(
-            Path(__file__).resolve().parent / "data" / "steam.sqlite3"
+            APP_DIR / "data" / "steam.sqlite3"
         )
         await steam_repository.initialize()
         steam_client = SteamClient(
@@ -281,7 +281,12 @@ async def run_bot(settings: Settings) -> None:
             retries=settings.steam_retry_times,
         )
         steam_service = SteamService(steam_client, steam_repository)
-        steam_controller = SteamController(steam_service, menus)
+        from steam.card import SteamCardRenderer
+
+        steam_card_renderer = SteamCardRenderer(http_client)
+        steam_controller = SteamController(
+            steam_service, menus, steam_card_renderer.render
+        )
         gift_client = GiftApiClient(
             http_client,
             settings.gift_api_base_url,
@@ -408,26 +413,32 @@ def main() -> int:
             reconfigure(encoding="utf-8", errors="backslashreplace")
 
     try:
-        settings = load_settings()
-    except ConfigurationError as exc:
-        print(f"配置错误：{exc}", file=sys.stderr)
-        return 2
+        with InstanceLock():
+            try:
+                settings = load_settings()
+            except ConfigurationError as exc:
+                print(f"配置错误：{exc}", file=sys.stderr)
+                return 2
 
-    configure_logging(settings)
-    logger.info(
-        "启动时间：%s | bot=%s | Python=%s",
-        datetime.now().astimezone().isoformat(timespec="seconds"),
-        BOT_NAME,
-        sys.version.split()[0],
-    )
-    try:
-        asyncio.run(run_bot(settings))
-    except KeyboardInterrupt:
-        logger.info("收到 Ctrl+C，机器人已停止")
-        return 0
-    except Exception:
-        logger.exception("机器人启动或运行失败")
-        return 1
+            configure_logging(settings)
+            logger.info(
+                "启动时间：%s | bot=%s | Python=%s | runtime_dir=%s",
+                datetime.now().astimezone().isoformat(timespec="seconds"),
+                BOT_NAME,
+                sys.version.split()[0],
+                APP_DIR,
+            )
+            try:
+                asyncio.run(run_bot(settings))
+            except KeyboardInterrupt:
+                logger.info("收到 Ctrl+C，机器人已停止")
+                return 0
+            except Exception:
+                logger.exception("机器人启动或运行失败")
+                return 1
+    except AlreadyRunningError as exc:
+        print(str(exc), file=sys.stderr)
+        return 3
     return 0
 
 

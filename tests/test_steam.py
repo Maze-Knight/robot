@@ -2,14 +2,17 @@ from __future__ import annotations
 
 import tempfile
 import unittest
+from io import BytesIO
 from pathlib import Path
 from types import SimpleNamespace
 from unittest.mock import AsyncMock
 
 import httpx
+from PIL import Image
 
 from steam import copywriting as copy
 from steam.client import SteamApiError, SteamClient, SteamInputError
+from steam.card import SteamCardRenderer
 from steam.commands import SteamController, parse_steam_command
 from steam.models import OfficialIdentity, SteamPlayer
 from steam.monitor import classify_game_transition
@@ -28,6 +31,7 @@ def player() -> SteamPlayer:
         game_id="730",
         game_name="Counter-Strike 2",
         profile_url="https://steamcommunity.com/profiles/" + STEAM_ID,
+        avatar_url="https://avatars.example/player.jpg",
         last_logoff=None,
     )
 
@@ -174,6 +178,33 @@ class SteamControllerTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(identity.group_id, "group-openid")
         self.assertIn("Steam 状态", context.reply.await_args.args[0])
 
+    async def test_status_uses_rendered_card_when_renderer_is_configured(self) -> None:
+        result = PlayerResult(player())
+        service = SimpleNamespace(get_profile=AsyncMock(return_value=result))
+        menus = SimpleNamespace(send_image=AsyncMock())
+        renderer = AsyncMock(return_value=b"png-card")
+        controller = SteamController(service, menus, renderer)
+        context = SimpleNamespace(
+            content="/当前状态",
+            scene_type="group",
+            group_id="group-openid",
+            user_id="member-openid",
+            message_id="message-id",
+            reply=AsyncMock(),
+        )
+
+        self.assertTrue(await controller.handle_text(context))
+
+        renderer.assert_awaited_once_with("status", result)
+        menus.send_image.assert_awaited_once_with(
+            "group",
+            "group-openid",
+            b"png-card",
+            reply_to="message-id",
+            file_name="steam-status.png",
+        )
+        context.reply.assert_not_awaited()
+
     async def test_c2c_identity_has_no_group_id(self) -> None:
         service = SimpleNamespace(get_profile=AsyncMock(return_value=None))
         controller = SteamController(service, SimpleNamespace())
@@ -209,6 +240,24 @@ class SteamControllerTests(unittest.IsolatedAsyncioTestCase):
             bound=False,
             event_id="interaction-id",
         )
+
+
+class SteamCardTests(unittest.IsolatedAsyncioTestCase):
+    async def test_renderer_outputs_png_with_player_avatar(self) -> None:
+        avatar = BytesIO()
+        Image.new("RGB", (184, 184), (30, 120, 210)).save(avatar, format="PNG")
+        response = httpx.Response(
+            200,
+            content=avatar.getvalue(),
+            request=httpx.Request("GET", "https://avatars.example/player.jpg"),
+        )
+        http = SimpleNamespace(get=AsyncMock(return_value=response))
+        rendered = await SteamCardRenderer(http).render("status", PlayerResult(player()))
+
+        self.assertTrue(rendered.startswith(b"\x89PNG\r\n\x1a\n"))
+        with Image.open(BytesIO(rendered)) as card:
+            self.assertEqual(card.size, (820, 330))
+        http.get.assert_awaited()
 
 
 if __name__ == "__main__":

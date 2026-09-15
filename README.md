@@ -131,6 +131,19 @@ python main.py
 
 按 `Ctrl+C` 停止。
 
+### 一键启动 EXE
+
+项目提供 Windows 单文件 EXE 构建脚本：
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\build_exe.ps1
+```
+
+结果位于 `dist\ElenaBot.exe`。部署时复制整个 `dist` 目录，将其中的
+`.env.example` 改名为 `.env` 并填写真实配置，然后双击 `ElenaBot.exe`。
+EXE 不包含任何真实凭证，且带有单实例锁，重复启动不会造成重复回复。
+完整步骤见 [DEPLOY_WINDOWS.md](DEPLOY_WINDOWS.md)。
+
 也可不创建 `.env`，仅对当前 PowerShell 会话设置环境变量：
 
 ```powershell

@@ -27,6 +27,7 @@ class SteamPlayer:
     game_id: str
     game_name: str
     profile_url: str
+    avatar_url: str
     last_logoff: int | None
 
     @property
@@ -37,4 +38,3 @@ class SteamPlayer:
             0: "离线", 1: "在线", 2: "忙碌", 3: "离开", 4: "打盹",
             5: "想交易", 6: "想玩游戏",
         }.get(self.persona_state, "未知")
-

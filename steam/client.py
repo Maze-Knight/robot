@@ -140,6 +140,8 @@ class SteamClient:
             game_id=str(player.get("gameid") or ""),
             game_name=str(player.get("gameextrainfo") or ""),
             profile_url=str(player.get("profileurl") or ""),
+            avatar_url=str(
+                player.get("avatarfull") or player.get("avatarmedium") or ""
+            ),
             last_logoff=int(player["lastlogoff"]) if player.get("lastlogoff") else None,
         )
-

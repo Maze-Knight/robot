@@ -232,6 +232,29 @@ class MenuTests(unittest.IsolatedAsyncioTestCase):
             markdown=True,
         )
 
+    async def test_group_image_upload_is_followed_by_passive_media_reply(self) -> None:
+        api = SimpleNamespace(
+            upload_group_file=AsyncMock(return_value={"file_info": "media-token"}),
+            post_group_message=AsyncMock(return_value={"id": "image-message"}),
+            next_msg_seq=Mock(return_value=42),
+        )
+        menus = MenuService(api, TerminalStatus())
+
+        await menus.send_image(
+            "group",
+            "group-openid",
+            b"png-bytes",
+            reply_to="incoming-message-id",
+        )
+
+        upload = api.upload_group_file.await_args.args[1].to_dict()
+        self.assertEqual(upload["file_type"], 1)
+        self.assertTrue(upload["file_data"])
+        message = api.post_group_message.await_args.args[1].to_dict()
+        self.assertEqual(message["msg_type"], 7)
+        self.assertEqual(message["msg_id"], "incoming-message-id")
+        self.assertEqual(message["media"]["file_info"], "media-token")
+
 
 class InteractionTests(unittest.IsolatedAsyncioTestCase):
     async def test_callback_is_acked_then_dispatches_services_menu(self) -> None:

@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import base64
 import threading
 from dataclasses import dataclass
 from typing import Any
@@ -19,6 +20,9 @@ from .keyboards import (
     build_steam_unbound_keyboard,
 )
 from steam import copywriting as steam_copy
+from qqbot_agent_sdk import MediaInfo, MessageToCreate, QQMessageType
+from qqbot_agent_sdk.constants import MEDIA_TYPE_IMAGE
+from qqbot_agent_sdk.dto import RichMediaMessage
 from gifts.models import GiftPeriod
 
 
@@ -309,3 +313,38 @@ class MenuService:
         if scene == "group":
             return await self._api.post_group_message(chat_id, outbound)
         raise ValueError(f"市政终端暂不支持场景：{scene}")
+
+    async def send_image(
+        self,
+        scene: str,
+        chat_id: str,
+        image: bytes,
+        *,
+        reply_to: str,
+        file_name: str = "steam-status.png",
+    ) -> dict[str, Any]:
+        """Upload an image and send it as a passive GROUP/C2C reply."""
+        upload = RichMediaMessage(
+            file_type=MEDIA_TYPE_IMAGE,
+            file_data=base64.b64encode(image).decode("ascii"),
+            file_name=file_name,
+            srv_send_msg=False,
+        )
+        if scene == "c2c":
+            uploaded = await self._api.upload_c2c_file(chat_id, upload)
+        elif scene == "group":
+            uploaded = await self._api.upload_group_file(chat_id, upload)
+        else:
+            raise ValueError(f"市政终端暂不支持场景：{scene}")
+        file_info = str(uploaded.get("file_info") or "")
+        if not file_info:
+            raise RuntimeError("QQ media upload response missing file_info")
+        message = MessageToCreate(
+            msg_type=QQMessageType.RICH_MEDIA,
+            msg_id=reply_to,
+            msg_seq=self._api.next_msg_seq(),
+            media=MediaInfo(file_info=file_info),
+        )
+        if scene == "c2c":
+            return await self._api.post_c2c_message(chat_id, message)
+        return await self._api.post_group_message(chat_id, message)

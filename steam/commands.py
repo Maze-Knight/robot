@@ -2,11 +2,13 @@ from __future__ import annotations
 
 import logging
 import re
+from collections.abc import Awaitable, Callable
 from typing import Any
 
 from . import copywriting as copy
 from .models import OfficialIdentity
 from .service import SteamService
+from .service import PlayerResult
 
 
 logger = logging.getLogger("elena.qq.steam")
@@ -36,9 +38,15 @@ def parse_steam_command(content: str) -> tuple[str, str] | None:
 
 
 class SteamController:
-    def __init__(self, service: SteamService, menus: Any) -> None:
+    def __init__(
+        self,
+        service: SteamService,
+        menus: Any,
+        card_renderer: Callable[[str, PlayerResult], Awaitable[bytes]] | None = None,
+    ) -> None:
         self._service = service
         self._menus = menus
+        self._card_renderer = card_renderer
 
     @staticmethod
     def _identity(scene: str, user_id: str, chat_id: str) -> OfficialIdentity:
@@ -60,9 +68,52 @@ class SteamController:
                 context.scene_type, chat_id, context.message_id
             )
             return True
+        if action in {"profile", "status"} and self._card_renderer is not None:
+            await self._send_player_card(action, context, identity, chat_id)
+            return True
         content = await self._execute(action, argument, identity)
         await context.reply(content)
         return True
+
+    async def _send_player_card(
+        self, action: str, context: Any, identity: OfficialIdentity, chat_id: str
+    ) -> None:
+        try:
+            result = await self._service.get_profile(identity)
+        except Exception as exc:
+            logger.exception(
+                "[STEAM] status query failed | action=%s | scene=%s",
+                action,
+                context.scene_type,
+            )
+            await context.reply(copy.error_text(exc))
+            return
+        if result is None:
+            await context.reply(copy.NOT_BOUND)
+            return
+        try:
+            image = await self._card_renderer(action, result)
+            await self._menus.send_image(
+                context.scene_type,
+                chat_id,
+                image,
+                reply_to=context.message_id,
+                file_name=f"steam-{action}.png",
+            )
+            logger.info(
+                "[STEAM] status card sent | action=%s | scene=%s | steam_id=%s",
+                action,
+                context.scene_type,
+                result.player.steam_id,
+            )
+        except Exception:
+            logger.exception(
+                "[STEAM] status card failed; falling back to text | action=%s | scene=%s",
+                action,
+                context.scene_type,
+            )
+            content = copy.profile(result) if action == "profile" else copy.status(result)
+            await context.reply(content)
 
     async def handle_interaction(
         self,
