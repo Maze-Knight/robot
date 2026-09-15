@@ -22,6 +22,7 @@ try {
         --clean `
         --onefile `
         --console `
+        --add-data "daily_draw_assets;daily_draw_assets" `
         --name "ElenaBot" `
         main.py
     if ($LASTEXITCODE -ne 0) { throw "Failed to build the EXE." }

@@ -15,6 +15,7 @@ class DrawItem:
     item_id: str
     name: str
     rarity: int
+    image: str = ""
 
 
 @dataclass(frozen=True, slots=True)
@@ -23,4 +24,3 @@ class DrawRecord:
     draw_date: str
     items: tuple[DrawItem, ...]
     created_at: str
-

@@ -63,7 +63,12 @@ class DrawRepository:
     def _save_if_absent_sync(self, record: DrawRecord) -> bool:
         payload = json.dumps(
             [
-                {"item_id": item.item_id, "name": item.name, "rarity": item.rarity}
+                {
+                    "item_id": item.item_id,
+                    "name": item.name,
+                    "rarity": item.rarity,
+                    "image": item.image,
+                }
                 for item in record.items
             ],
             ensure_ascii=False,
@@ -83,4 +88,3 @@ class DrawRepository:
                 ),
             )
         return cursor.rowcount == 1
-

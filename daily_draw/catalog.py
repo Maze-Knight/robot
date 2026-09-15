@@ -51,16 +51,18 @@ class DrawCatalog:
         if isinstance(entry, str):
             name = entry.strip()
             item_id = f"{key}-{index}"
+            image = ""
         elif isinstance(entry, dict):
             name = str(entry.get("name", "")).strip()
             item_id = str(entry.get("id", f"{key}-{index}")).strip()
+            image = str(entry.get("image", "")).strip()
         else:
             raise DrawCatalogError(f"{key} 第 {index} 项必须是文字或对象")
         if not name:
             raise DrawCatalogError(f"{key} 第 {index} 项缺少 name")
         if not item_id:
             raise DrawCatalogError(f"{key} 第 {index} 项缺少 id")
-        return DrawItem(item_id=item_id, name=name, rarity=rarity)
+        return DrawItem(item_id=item_id, name=name, rarity=rarity, image=image)
 
     @property
     def ready(self) -> bool:
@@ -68,4 +70,3 @@ class DrawCatalog:
 
     def items(self, rarity: int) -> tuple[DrawItem, ...]:
         return self._pools.get(rarity, ())
-

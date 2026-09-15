@@ -12,7 +12,7 @@ from logging.handlers import RotatingFileHandler
 from typing import Any
 
 from config import ConfigurationError, Settings, load_settings
-from runtime import APP_DIR, AlreadyRunningError, InstanceLock
+from runtime import APP_DIR, RESOURCE_DIR, AlreadyRunningError, InstanceLock
 
 
 BOT_NAME = "艾琳娜"
@@ -249,6 +249,7 @@ async def run_bot(settings: Settings) -> None:
     from gifts.commands import GiftController
     from gifts.service import GiftQueryService
     from daily_draw.catalog import DrawCatalog, DrawCatalogError
+    from daily_draw.card import DailyDrawCardRenderer
     from daily_draw.commands import DailyDrawController
     from daily_draw.repository import DrawRepository
     from daily_draw.service import DailyDrawService
@@ -310,7 +311,11 @@ async def run_bot(settings: Settings) -> None:
             logger.error("[DAILY_DRAW] 奖池配置无效 | reason=%s", exc)
             draw_catalog = DrawCatalog({rarity: () for rarity in (1, 2, 3)})
         draw_service = DailyDrawService(draw_catalog, draw_repository)
-        draw_controller = DailyDrawController(draw_service, menus)
+        draw_controller = DailyDrawController(
+            draw_service,
+            menus,
+            DailyDrawCardRenderer(RESOURCE_DIR / "daily_draw_assets"),
+        )
         steam_monitor = SteamMonitor(settings.steam_monitor_enabled)
         if steam_monitor.enabled:
             logger.warning(

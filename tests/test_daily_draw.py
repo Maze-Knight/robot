@@ -7,11 +7,13 @@ from pathlib import Path
 from unittest.mock import AsyncMock
 
 from daily_draw.catalog import DrawCatalog
+from daily_draw.card import DailyDrawCardRenderer
 from daily_draw.commands import DailyDrawController, parse_draw_command
 from daily_draw.engine import DrawEngine
 from daily_draw.models import DrawIdentity
 from daily_draw.repository import DrawRepository
 from daily_draw.service import DailyDrawService
+from PIL import Image
 
 
 class FakeRandom:
@@ -54,6 +56,24 @@ class DrawEngineTests(unittest.TestCase):
         self.assertEqual(len(result), 10)
         self.assertTrue(any(item.rarity >= 2 for item in result))
         self.assertEqual(result[-1].rarity, 2)
+
+    def test_renderer_builds_ten_pull_png_with_portraits(self) -> None:
+        from daily_draw.models import DrawItem, DrawRecord
+
+        with tempfile.TemporaryDirectory() as folder:
+            root = Path(folder)
+            Image.new("RGB", (252, 252), "#ff99aa").save(root / "portrait.png")
+            item = DrawItem("test", "测试使徒", 3, "portrait.png")
+            record = DrawRecord(
+                DrawIdentity("qq_official", "member"),
+                "2026-09-15",
+                (item,) * 10,
+                "2026-09-15T12:00:00+08:00",
+            )
+            rendered = DailyDrawCardRenderer(root).render(record)
+            with Image.open(__import__("io").BytesIO(rendered)) as image:
+                self.assertEqual(image.size, (1000, 650))
+                self.assertEqual(image.format, "PNG")
 
 
 class DailyDrawServiceTests(unittest.IsolatedAsyncioTestCase):
