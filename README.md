@@ -21,9 +21,22 @@
 [📢 公告记录] [📖 使用说明]
 ```
 
-菜单最大深度为主菜单到二级菜单。Steam 监测站与礼包性价比查询已经接入；每日抽取、图鉴和实验功能仍是占位回复。角色文案集中在 `ui/copywriting.py`；菜单页面、键盘和 Interaction 路由分别位于 `ui/menus.py`、`ui/keyboards.py`、`ui/interactions.py`。
+菜单最大深度为主菜单到二级菜单。Steam 监测站、礼包性价比查询和每日抽取框架已经接入；图鉴和实验功能仍是占位回复。角色文案集中在各模块的 `copywriting.py`；菜单页面、键盘和 Interaction 路由分别位于 `ui/menus.py`、`ui/keyboards.py`、`ui/interactions.py`。
 
-当前不包含 NoneBot2、数据库、AI 或任何旧机器人插件。
+当前不包含 NoneBot2、AI 或其他未迁移业务插件。
+
+### 每日抽取（奖池待录入）
+
+发送 `/每日抽取` 可进入每日抽取页面，按钮使用中文指令：
+
+```text
+/进行十连
+/抽取记录
+```
+
+当前规则固定为：每个 QQ 官方身份每天一次十连；★★★ 3%、★★ 21%、★ 76%，且十连至少出现一个 ★★ 或以上。日期按北京时间计算，结果保存在 `data/daily_draw.sqlite3`，并通过数据库唯一约束避免并发重复抽取。
+
+抽取内容尚未提供，因此仓库中的 `daily_draw_pool.json` 保持空奖池。空奖池状态只展示“名单待装填”，不会消耗当天次数，也不会生成虚构角色或奖品。后续收到正式名单后再按星级填入该文件。
 
 ## 技术选择（调研日期：2026-09-11）
 
@@ -67,6 +80,8 @@ qq-official-bot/
 ├─ requirements.txt         # 固定官方 SDK 版本及直接依赖
 ├─ README.md                # 本文档
 ├─ gifts/                   # 礼包网站只读 API、期次查询与展示
+├─ daily_draw/              # 每日十连概率、次数控制与结果记录
+├─ daily_draw_pool.json     # 抽取名单（当前等待用户提供内容）
 ├─ steam/                   # Steam 主动查询与身份绑定
 ├─ ui/                      # Markdown 菜单和中文指令按钮
 ├─ logs/

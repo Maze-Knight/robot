@@ -44,6 +44,7 @@ class MessageContext:
     show_markdown_test: UIFunction | None = field(default=None, repr=False)
     steam_handler: PluginHandler | None = field(default=None, repr=False)
     gift_handler: PluginHandler | None = field(default=None, repr=False)
+    draw_handler: PluginHandler | None = field(default=None, repr=False)
     menu_handler: PluginHandler | None = field(default=None, repr=False)
 
 
@@ -157,6 +158,7 @@ async def handle_message(context: MessageContext) -> None:
     for handler_name, handler in (
         ("Steam消息", context.steam_handler),
         ("礼包查询", context.gift_handler),
+        ("每日抽取", context.draw_handler),
         ("菜单指令", context.menu_handler),
     ):
         if handler is None:
@@ -190,6 +192,7 @@ def make_message_context(
     show_markdown_test: UIFunction | None = None,
     steam_handler: PluginHandler | None = None,
     gift_handler: PluginHandler | None = None,
+    draw_handler: PluginHandler | None = None,
     menu_handler: PluginHandler | None = None,
 ) -> MessageContext:
     """Convert an SDK InboundEvent into the stable application context."""
@@ -217,6 +220,7 @@ def make_message_context(
         show_markdown_test=show_markdown_test,
         steam_handler=steam_handler,
         gift_handler=gift_handler,
+        draw_handler=draw_handler,
         menu_handler=menu_handler,
     )
 
@@ -244,6 +248,10 @@ async def run_bot(settings: Settings) -> None:
     from gifts.client import GiftApiClient
     from gifts.commands import GiftController
     from gifts.service import GiftQueryService
+    from daily_draw.catalog import DrawCatalog, DrawCatalogError
+    from daily_draw.commands import DailyDrawController
+    from daily_draw.repository import DrawRepository
+    from daily_draw.service import DailyDrawService
 
     # SDK 1.2.2 has no public per-client intents argument and otherwise requests
     # unrelated guild/interaction privileges. Keep this pinned-version project
@@ -294,6 +302,15 @@ async def run_bot(settings: Settings) -> None:
         )
         gift_service = GiftQueryService(gift_client)
         gift_controller = GiftController(gift_service, menus)
+        draw_repository = DrawRepository(APP_DIR / "data" / "daily_draw.sqlite3")
+        await draw_repository.initialize()
+        try:
+            draw_catalog = DrawCatalog.load(APP_DIR / "daily_draw_pool.json")
+        except DrawCatalogError as exc:
+            logger.error("[DAILY_DRAW] 奖池配置无效 | reason=%s", exc)
+            draw_catalog = DrawCatalog({rarity: () for rarity in (1, 2, 3)})
+        draw_service = DailyDrawService(draw_catalog, draw_repository)
+        draw_controller = DailyDrawController(draw_service, menus)
         steam_monitor = SteamMonitor(settings.steam_monitor_enabled)
         if steam_monitor.enabled:
             logger.warning(
@@ -306,6 +323,10 @@ async def run_bot(settings: Settings) -> None:
         logger.info(
             "[GIFT] query initialized | api_configured=%s",
             gift_client.configured,
+        )
+        logger.info(
+            "[DAILY_DRAW] initialized | pool_ready=%s | daily_limit=1x10",
+            draw_catalog.ready,
         )
 
         async def on_message_event(event_type: str, raw: dict[str, Any]) -> None:
@@ -327,6 +348,7 @@ async def run_bot(settings: Settings) -> None:
                     ),
                     steam_handler=steam_controller.handle_text,
                     gift_handler=gift_controller.handle_text,
+                    draw_handler=draw_controller.handle_text,
                     menu_handler=menus.handle_text,
                 )
                 logger.info(

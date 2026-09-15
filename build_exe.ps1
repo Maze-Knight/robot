@@ -28,6 +28,7 @@ try {
 
     Copy-Item -LiteralPath ".env.example" -Destination "dist\.env.example" -Force
     Copy-Item -LiteralPath "DEPLOY_WINDOWS.md" -Destination "dist\DEPLOY_WINDOWS.md" -Force
+    Copy-Item -LiteralPath "daily_draw_pool.json" -Destination "dist\daily_draw_pool.json" -Force
     New-Item -ItemType Directory -Path "dist\data" -Force | Out-Null
     New-Item -ItemType Directory -Path "dist\logs" -Force | Out-Null
 

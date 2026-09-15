@@ -136,6 +136,20 @@ def build_services_keyboard() -> InlineKeyboard:
     )
 
 
+def build_daily_draw_keyboard() -> InlineKeyboard:
+    return _keyboard(
+        [
+            [
+                _command_button("draw_ten", "🎲 进行十连", "/进行十连"),
+                _command_button("draw_record", "📜 今日记录", "/抽取记录"),
+            ],
+            [
+                _command_button("draw_back", "🔙 市政服务", "/市政服务", style=0),
+            ],
+        ]
+    )
+
+
 def build_gift_keyboard() -> InlineKeyboard:
     return _keyboard(
         [

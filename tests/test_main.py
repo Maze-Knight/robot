@@ -54,6 +54,8 @@ class MessageHandlerTests(unittest.IsolatedAsyncioTestCase):
 
     async def test_unmatched_plugin_falls_through_to_menu_handler(self) -> None:
         steam_handler = AsyncMock(return_value=False)
+        gift_handler = AsyncMock(return_value=False)
+        draw_handler = AsyncMock(return_value=False)
         menu_handler = AsyncMock(return_value=True)
         context = MessageContext(
             platform="qq_official",
@@ -66,12 +68,16 @@ class MessageHandlerTests(unittest.IsolatedAsyncioTestCase):
             message_type=0,
             reply=AsyncMock(),
             steam_handler=steam_handler,
+            gift_handler=gift_handler,
+            draw_handler=draw_handler,
             menu_handler=menu_handler,
         )
 
         await handle_message(context)
 
         steam_handler.assert_awaited_once_with(context)
+        gift_handler.assert_awaited_once_with(context)
+        draw_handler.assert_awaited_once_with(context)
         menu_handler.assert_awaited_once_with(context)
 
 
