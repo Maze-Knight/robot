@@ -160,7 +160,7 @@ class DailyDrawServiceTests(unittest.IsolatedAsyncioTestCase):
 
 class DailyDrawControllerTests(unittest.IsolatedAsyncioTestCase):
     def test_commands_are_chinese(self) -> None:
-        self.assertEqual(parse_draw_command("/每日抽取"), "home")
+        self.assertEqual(parse_draw_command("/每日抽取"), "draw")
         self.assertEqual(parse_draw_command("/进行十连"), "draw")
         self.assertEqual(parse_draw_command("/抽取记录"), "record")
         self.assertEqual(parse_draw_command("/图鉴"), "collection")

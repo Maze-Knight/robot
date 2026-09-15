@@ -14,8 +14,8 @@ logger = logging.getLogger("elena.qq.daily_draw")
 def parse_draw_command(content: str) -> str | None:
     command = content.strip().casefold()
     commands = {
-        "每日抽取": "home",
-        "/每日抽取": "home",
+        "每日抽取": "draw",
+        "/每日抽取": "draw",
         "进行十连": "draw",
         "/进行十连": "draw",
         "今日抽取": "record",
