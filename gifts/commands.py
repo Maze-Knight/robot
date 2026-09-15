@@ -15,8 +15,10 @@ logger = logging.getLogger("elena.qq.gifts")
 def parse_gift_command(content: str) -> tuple[str, str] | None:
     text = content.strip()
     lowered = text.casefold()
-    if lowered in {"礼包", "/礼包", "礼包查询", "/礼包查询"}:
+    if lowered in {"礼包", "/礼包"}:
         return "home", ""
+    if lowered in {"礼包查询", "/礼包查询"}:
+        return "ranking", ""
     if lowered in {"礼包期次", "/礼包期次"}:
         return "periods", "1"
     if lowered in {"礼包列表", "/礼包列表"}:

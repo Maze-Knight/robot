@@ -170,6 +170,34 @@ class KeyboardTests(unittest.TestCase):
 
 
 class MenuTests(unittest.IsolatedAsyncioTestCase):
+    async def test_long_gift_view_is_split_without_losing_entries(self) -> None:
+        messages: list[object] = []
+
+        def build_text(content: str, **_: object) -> object:
+            message = SimpleNamespace(content=content)
+            messages.append(message)
+            return message
+
+        api = SimpleNamespace(
+            build_text_body=Mock(side_effect=build_text),
+            post_group_message=AsyncMock(return_value={"id": "gift-message"}),
+        )
+        menus = MenuService(api, TerminalStatus())
+        entries = [
+            f"**{index}. 完整礼包{index}**\n价格、价值、每元折算水晶叶和推荐等级"
+            for index in range(1, 301)
+        ]
+        content = "# 最新一期\n\n" + "\n\n".join(entries)
+
+        await menus.send_gift_view(
+            "group", "group-openid", content, reply_to="incoming-message"
+        )
+
+        sent = "\n\n".join(message.content for message in messages)
+        for index in range(1, 301):
+            self.assertIn(f"完整礼包{index}", sent)
+        self.assertGreater(len(messages), 1)
+
     async def test_message_menu_route_calls_ui_handler(self) -> None:
         show_menu = AsyncMock(return_value={"id": "menu-message"})
         context = MessageContext(

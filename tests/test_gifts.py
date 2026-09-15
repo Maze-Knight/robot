@@ -15,7 +15,8 @@ from gifts.service import GiftQueryService
 
 class GiftCommandTests(unittest.TestCase):
     def test_chinese_query_commands(self) -> None:
-        self.assertEqual(parse_gift_command("/礼包查询"), ("home", ""))
+        self.assertEqual(parse_gift_command("/礼包查询"), ("ranking", ""))
+        self.assertEqual(parse_gift_command("/礼包"), ("home", ""))
         self.assertEqual(parse_gift_command("/礼包排行"), ("ranking", ""))
         self.assertEqual(parse_gift_command("/礼包列表 2"), ("periods", "2"))
         self.assertEqual(
@@ -119,8 +120,65 @@ class GiftServiceTests(unittest.IsolatedAsyncioTestCase):
         self.assertIn("3 叶/元", content)
         self.assertNotIn("999999", content)
 
+    async def test_ranking_displays_every_visible_gift_without_omission_notice(self) -> None:
+        period = self.period("第12期")
+        gifts = [
+            Gift(
+                f"gift-{index}",
+                f"完整礼包{index}",
+                10 + index,
+                100 + index,
+                20 - index / 10,
+                "good",
+                "active",
+                True,
+                False,
+                None,
+                None,
+                "none",
+            )
+            for index in range(1, 13)
+        ]
+        client = SimpleNamespace(
+            list_periods=AsyncMock(return_value=[period]),
+            list_gifts=AsyncMock(return_value=gifts),
+            list_rating_rules=AsyncMock(return_value=[]),
+        )
+
+        content = (await GiftQueryService(client).ranking()).content
+
+        for index in range(1, 13):
+            self.assertIn(f"完整礼包{index}", content)
+        self.assertNotIn("未展开", content)
+
 
 class GiftControllerTests(unittest.IsolatedAsyncioTestCase):
+    async def test_gift_query_opens_latest_ranking_directly(self) -> None:
+        service = SimpleNamespace(
+            client=SimpleNamespace(configured=True),
+            ranking=AsyncMock(return_value=SimpleNamespace(
+                content="最新一期完整排行",
+                periods=(),
+                period_page=1,
+                period_total_pages=1,
+            )),
+        )
+        menus = SimpleNamespace(send_gift_view=AsyncMock())
+        controller = GiftController(service, menus)
+        context = SimpleNamespace(
+            content="/礼包查询",
+            scene_type="group",
+            group_id="group-openid",
+            user_id="member-openid",
+            message_id="message-id",
+            reply=AsyncMock(),
+        )
+
+        self.assertTrue(await controller.handle_text(context))
+
+        service.ranking.assert_awaited_once_with("")
+        self.assertEqual(menus.send_gift_view.await_args.args[2], "最新一期完整排行")
+
     async def test_unconfigured_source_explains_required_setting(self) -> None:
         service = SimpleNamespace(client=SimpleNamespace(configured=False))
         menus = SimpleNamespace(send_gift_view=AsyncMock())

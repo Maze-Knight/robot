@@ -173,7 +173,7 @@ def build_gift_periods_keyboard(
             _command_button("gift_period_next", "➡️ 下一页", f"/礼包列表 {page + 1}", style=0)
         )
     navigation.append(
-        _command_button("gift_period_home", "🎁 查询首页", "/礼包查询", style=0)
+        _command_button("gift_period_latest", "📊 最新一期", "/礼包查询", style=0)
     )
     rows.append(navigation)
     return _keyboard(rows)

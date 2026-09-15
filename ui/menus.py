@@ -209,13 +209,40 @@ class MenuService:
             if periods
             else build_gift_keyboard()
         )
-        return await self._send_markdown_keyboard(
-            scene,
-            chat_id,
-            content,
-            keyboard,
-            reply_to=reply_to,
-        )
+        result: dict[str, Any] = {}
+        chunks = self._split_markdown(content)
+        for index, chunk in enumerate(chunks):
+            result = await self._send_markdown_keyboard(
+                scene,
+                chat_id,
+                chunk,
+                keyboard if index == len(chunks) - 1 else None,
+                reply_to=reply_to,
+            )
+        return result
+
+    @staticmethod
+    def _split_markdown(content: str, max_length: int = 3800) -> list[str]:
+        """Split complete gift results without letting the SDK truncate them."""
+        if len(content) <= max_length:
+            return [content]
+        chunks: list[str] = []
+        current = ""
+        for paragraph in content.split("\n\n"):
+            candidate = paragraph if not current else f"{current}\n\n{paragraph}"
+            if len(candidate) <= max_length:
+                current = candidate
+                continue
+            if current:
+                chunks.append(current)
+                current = ""
+            while len(paragraph) > max_length:
+                chunks.append(paragraph[:max_length])
+                paragraph = paragraph[max_length:]
+            current = paragraph
+        if current:
+            chunks.append(current)
+        return chunks
 
     async def send_experiments_menu(
         self,

@@ -56,8 +56,6 @@ def ranking(
     period: GiftPeriod,
     gifts: list[Gift],
     rules: dict[str, RatingRule],
-    *,
-    limit: int = 8,
 ) -> str:
     visible = [gift for gift in gifts if gift.show_in_ranking]
     free = sorted(
@@ -75,7 +73,7 @@ def ranking(
         return f"# 🎁 {period.name}\n\n这一期还没有可展示的礼包数据。"
 
     lines: list[str] = []
-    for index, gift in enumerate(ordered[:limit], start=1):
+    for index, gift in enumerate(ordered, start=1):
         rating = _rating_name(gift, rules)
         if gift.is_free:
             metrics = f"免费｜价值 {_fmt(gift.total_value)} 叶｜{rating}"
@@ -86,12 +84,9 @@ def ranking(
             )
         lines.append(f"**{index}. {gift.display_name}**\n{metrics}")
 
-    omitted = len(ordered) - min(len(ordered), limit)
-    footer = f"\n\n另有 {omitted} 项未展开。" if omitted else ""
     return (
         f"# 🎁 {period.name} · 性价比排行\n\n"
         + "\n\n".join(lines)
-        + footer
         + "\n\n排序口径：免费礼包优先；付费礼包按每元折算水晶叶降序。"
     )
 
