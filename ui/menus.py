@@ -8,6 +8,7 @@ from typing import Any
 from . import copywriting as copy
 from .keyboards import (
     build_action_test_keyboard,
+    build_collection_keyboard,
     build_daily_draw_keyboard,
     build_experiments_keyboard,
     build_help_keyboard,
@@ -79,7 +80,6 @@ class MenuService:
             return True
 
         text_actions = {
-            "/图鉴": copy.COLLECTION_PLACEHOLDER,
             "/随机实验": copy.RANDOM_EXPERIMENT_PLACEHOLDER,
             "/对话测试": copy.CHAT_EXPERIMENT_PLACEHOLDER,
             "/最近更新": copy.RECENT_UPDATES,
@@ -185,6 +185,22 @@ class MenuService:
             chat_id,
             content,
             build_daily_draw_keyboard(),
+            reply_to=reply_to,
+        )
+
+    async def send_collection_view(
+        self,
+        scene: str,
+        chat_id: str,
+        content: str,
+        *,
+        reply_to: str | None = None,
+    ) -> dict[str, Any]:
+        return await self._send_markdown_keyboard(
+            scene,
+            chat_id,
+            content,
+            build_collection_keyboard(),
             reply_to=reply_to,
         )
 

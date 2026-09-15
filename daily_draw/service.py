@@ -5,7 +5,14 @@ from datetime import datetime, timedelta, timezone
 
 from .catalog import DrawCatalog
 from .engine import DrawEngine
-from .models import DrawIdentity, DrawRecord
+from .models import (
+    CollectionEntry,
+    CollectionSnapshot,
+    CollectionUpdate,
+    DrawIdentity,
+    DrawItem,
+    DrawRecord,
+)
 from .repository import DrawRepository
 
 
@@ -16,6 +23,7 @@ CHINA_TZ = timezone(timedelta(hours=8))
 class DrawOutcome:
     state: str
     record: DrawRecord | None = None
+    updates: tuple[CollectionUpdate, ...] = ()
 
 
 class DailyDrawService:
@@ -37,6 +45,14 @@ class DailyDrawService:
     async def get_today(self, identity: DrawIdentity) -> DrawRecord | None:
         return await self.repository.get(identity, self.today())
 
+    async def collection(self, identity: DrawIdentity) -> CollectionSnapshot:
+        counts = await self.repository.get_collection_counts(identity)
+        entries = tuple(
+            CollectionEntry(item, counts.get(item.item_id, 0))
+            for item in self.catalog.all_items()
+        )
+        return CollectionSnapshot(identity, entries)
+
     async def draw(self, identity: DrawIdentity) -> DrawOutcome:
         draw_date = self.today()
         existing = await self.repository.get(identity, draw_date)
@@ -51,5 +67,19 @@ class DailyDrawService:
             created_at=datetime.now(CHINA_TZ).isoformat(timespec="seconds"),
         )
         stored, inserted = await self.repository.save_if_absent(record)
-        return DrawOutcome("drawn" if inserted else "already_drawn", stored)
-
+        if not inserted:
+            return DrawOutcome("already_drawn", stored)
+        counts = await self.repository.get_collection_counts(identity)
+        pulled: dict[str, tuple[DrawItem, int]] = {}
+        for item in stored.items:
+            _, amount = pulled.get(item.item_id, (item, 0))
+            pulled[item.item_id] = (item, amount + 1)
+        updates = tuple(
+            CollectionUpdate(
+                item=item,
+                previous_copies=counts[item_id] - amount,
+                copies=counts[item_id],
+            )
+            for item_id, (item, amount) in pulled.items()
+        )
+        return DrawOutcome("drawn", stored, updates)

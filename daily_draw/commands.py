@@ -22,6 +22,8 @@ def parse_draw_command(content: str) -> str | None:
         "/今日抽取": "record",
         "抽取记录": "record",
         "/抽取记录": "record",
+        "图鉴": "collection",
+        "/图鉴": "collection",
     }
     return commands.get(command)
 
@@ -36,15 +38,21 @@ class DailyDrawController:
         action = parse_draw_command(context.content)
         if action is None:
             return False
-        identity = DrawIdentity(
-            context.platform, context.user_id, context.group_id or ""
-        )
+        # QQ Official openid/member_openid is the only trustworthy user key.
+        # Keep the collection user-scoped instead of creating one per group.
+        identity = DrawIdentity(context.platform, context.user_id)
         chat_id = context.group_id or context.user_id
+        outcome_record = None
+        snapshot = None
         if action == "home":
             content = copy.HOME if self._service.catalog.ready else copy.POOL_NOT_READY
+        elif action == "collection":
+            snapshot = await self._service.collection(identity)
+            content = copy.collection_text(snapshot)
         elif action == "record":
             record = await self._service.get_today(identity)
             content = copy.record_text(record, already_drawn=True) if record else copy.NO_RECORD
+            outcome_record = record
         else:
             outcome = await self._service.draw(identity)
             if outcome.state == "pool_not_ready":
@@ -52,12 +60,12 @@ class DailyDrawController:
             else:
                 assert outcome.record is not None
                 content = copy.record_text(
-                    outcome.record, already_drawn=outcome.state == "already_drawn"
+                    outcome.record,
+                    already_drawn=outcome.state == "already_drawn",
+                    updates=outcome.updates,
                 )
-        if outcome_record := (
-            record if action == "record" and record else
-            outcome.record if action == "draw" and outcome.record else None
-        ):
+                outcome_record = outcome.record
+        if outcome_record is not None:
             if self._renderer is not None:
                 try:
                     image = self._renderer.render(outcome_record)
@@ -75,7 +83,27 @@ class DailyDrawController:
                         context.scene_type,
                         context.message_id,
                     )
-        await self._menus.send_daily_draw_view(
+        if snapshot is not None and self._renderer is not None:
+            try:
+                image = self._renderer.render_collection(snapshot)
+                await self._menus.send_image(
+                    context.scene_type,
+                    chat_id,
+                    image,
+                    reply_to=context.message_id,
+                )
+            except Exception:
+                logger.exception(
+                    "[DAILY_DRAW] collection card failed | scene=%s | message_id=%s",
+                    context.scene_type,
+                    context.message_id,
+                )
+        send_view = (
+            self._menus.send_collection_view
+            if action == "collection"
+            else self._menus.send_daily_draw_view
+        )
+        await send_view(
             context.scene_type,
             chat_id,
             content,

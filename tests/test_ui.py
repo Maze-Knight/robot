@@ -8,6 +8,7 @@ from main import MessageContext, handle_message
 from ui.interactions import handle_interaction
 from ui.keyboards import (
     build_action_test_keyboard,
+    build_collection_keyboard,
     build_daily_draw_keyboard,
     build_experiments_keyboard,
     build_gift_keyboard,
@@ -73,6 +74,7 @@ class KeyboardTests(unittest.TestCase):
     def test_every_official_menu_omits_undocumented_button_group_id(self) -> None:
         keyboards = (
             build_main_keyboard(),
+            build_collection_keyboard(),
             build_daily_draw_keyboard(),
             build_services_keyboard(),
             build_steam_keyboard(),
@@ -132,6 +134,10 @@ class KeyboardTests(unittest.TestCase):
         self.assertEqual(
             self._button_data(build_daily_draw_keyboard()),
             ["/进行十连", "/抽取记录", "/市政服务"],
+        )
+        self.assertEqual(
+            self._button_data(build_collection_keyboard()),
+            ["/图鉴", "/每日抽取", "/市政服务"],
         )
 
     def test_steam_menu_is_shallow_and_uses_stable_data(self) -> None:

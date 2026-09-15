@@ -70,3 +70,10 @@ class DrawCatalog:
 
     def items(self, rarity: int) -> tuple[DrawItem, ...]:
         return self._pools.get(rarity, ())
+
+    def all_items(self) -> tuple[DrawItem, ...]:
+        return tuple(
+            item
+            for rarity in (3, 2, 1)
+            for item in self.items(rarity)
+        )

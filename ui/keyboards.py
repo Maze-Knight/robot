@@ -150,6 +150,20 @@ def build_daily_draw_keyboard() -> InlineKeyboard:
     )
 
 
+def build_collection_keyboard() -> InlineKeyboard:
+    return _keyboard(
+        [
+            [
+                _command_button("collection_refresh", "🔄 刷新图鉴", "/图鉴"),
+                _command_button("collection_draw", "🎲 每日抽取", "/每日抽取"),
+            ],
+            [
+                _command_button("collection_back", "🔙 市政服务", "/市政服务", style=0),
+            ],
+        ]
+    )
+
+
 def build_gift_keyboard() -> InlineKeyboard:
     return _keyboard(
         [
