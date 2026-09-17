@@ -29,6 +29,7 @@ async def handle_interaction(
     api: Any,
     menus: MenuService,
     steam_controller: Any | None = None,
+    trickcal_controller: Any | None = None,
 ) -> None:
     interaction = parse_interaction_event(raw)
     scene = (
@@ -97,6 +98,14 @@ async def handle_interaction(
             )
         elif button_data.startswith("steam:") and steam_controller is not None:
             await steam_controller.handle_interaction(
+                scene,
+                interaction.chat_id,
+                interaction.operator_openid,
+                button_data,
+                interaction.id,
+            )
+        elif button_data.startswith("trickcal:") and trickcal_controller is not None:
+            await trickcal_controller.handle_interaction(
                 scene,
                 interaction.chat_id,
                 interaction.operator_openid,

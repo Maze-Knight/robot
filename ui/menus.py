@@ -20,6 +20,9 @@ from .keyboards import (
     build_steam_keyboard,
     build_steam_result_keyboard,
     build_steam_unbound_keyboard,
+    build_trickcal_keyboard,
+    build_trickcal_empty_keyboard,
+    build_trickcal_login_keyboard,
 )
 from steam import copywriting as steam_copy
 from qqbot_agent_sdk import MediaInfo, MessageToCreate, QQMessageType
@@ -73,6 +76,7 @@ class MenuService:
             "/公告记录": self.send_notices_menu,
             "/使用说明": self.send_help_menu,
             "/steam监测站": self.send_steam_home,
+            "/蜡笔板": self.send_trickcal_home,
         }
         menu_action = menu_actions.get(command)
         if menu_action is not None:
@@ -169,6 +173,60 @@ class MenuService:
             steam_copy.STEAM_HOME,
             build_steam_keyboard(),
             reply_to=reply_to,
+            event_id=event_id,
+        )
+
+    async def send_trickcal_home(
+        self,
+        scene: str,
+        chat_id: str,
+        reply_to: str | None = None,
+        *,
+        event_id: str | None = None,
+        content: str | None = None,
+    ) -> dict[str, Any]:
+        from trickcal import copywriting as trickcal_copy
+
+        return await self._send_markdown_keyboard(
+            scene,
+            chat_id,
+            content or trickcal_copy.HOME,
+            build_trickcal_keyboard(),
+            reply_to=reply_to,
+            event_id=event_id,
+        )
+
+    async def send_trickcal_login(
+        self,
+        scene: str,
+        chat_id: str,
+        content: str,
+        url: str,
+        *,
+        event_id: str | None = None,
+    ) -> dict[str, Any]:
+        return await self._send_markdown_keyboard(
+            scene,
+            chat_id,
+            content,
+            build_trickcal_login_keyboard(url),
+            event_id=event_id,
+        )
+
+    async def send_trickcal_empty(
+        self,
+        scene: str,
+        chat_id: str,
+        *,
+        event_id: str | None = None,
+    ) -> dict[str, Any]:
+        from trickcal import copywriting as trickcal_copy
+
+        return await self._send_markdown_keyboard(
+            scene,
+            chat_id,
+            trickcal_copy.EMPTY,
+            build_trickcal_empty_keyboard(),
             event_id=event_id,
         )
 

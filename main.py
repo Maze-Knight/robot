@@ -5,6 +5,7 @@ import logging
 import re
 import sys
 import threading
+from contextlib import suppress
 from collections.abc import Awaitable, Callable
 from dataclasses import dataclass, field
 from datetime import datetime
@@ -46,6 +47,7 @@ class MessageContext:
     gift_handler: PluginHandler | None = field(default=None, repr=False)
     draw_handler: PluginHandler | None = field(default=None, repr=False)
     menu_handler: PluginHandler | None = field(default=None, repr=False)
+    trickcal_handler: PluginHandler | None = field(default=None, repr=False)
 
 
 class SecretRedactionFilter(logging.Filter):
@@ -97,7 +99,9 @@ def configure_logging(settings: Settings) -> None:
         "%(asctime)s | %(levelname)s | %(name)s | %(message)s",
         datefmt="%Y-%m-%d %H:%M:%S",
     )
-    redactor = SecretRedactionFilter((settings.app_secret, settings.steam_api_key))
+    redactor = SecretRedactionFilter(
+        (settings.app_secret, settings.steam_api_key, settings.trickcal_bot_api_key)
+    )
 
     console = logging.StreamHandler()
     console.setFormatter(formatter)
@@ -159,6 +163,7 @@ async def handle_message(context: MessageContext) -> None:
         ("Steam消息", context.steam_handler),
         ("礼包查询", context.gift_handler),
         ("每日抽取", context.draw_handler),
+        ("蜡笔板", context.trickcal_handler),
         ("菜单指令", context.menu_handler),
     ):
         if handler is None:
@@ -194,6 +199,7 @@ def make_message_context(
     gift_handler: PluginHandler | None = None,
     draw_handler: PluginHandler | None = None,
     menu_handler: PluginHandler | None = None,
+    trickcal_handler: PluginHandler | None = None,
 ) -> MessageContext:
     """Convert an SDK InboundEvent into the stable application context."""
 
@@ -222,6 +228,7 @@ def make_message_context(
         gift_handler=gift_handler,
         draw_handler=draw_handler,
         menu_handler=menu_handler,
+        trickcal_handler=trickcal_handler,
     )
 
 
@@ -253,6 +260,9 @@ async def run_bot(settings: Settings) -> None:
     from daily_draw.commands import DailyDrawController
     from daily_draw.repository import DrawRepository
     from daily_draw.service import DailyDrawService
+    from trickcal.commands import TrickcalController
+    from trickcal.client import TrickcalClient
+    from trickcal.remote_service import TrickcalRemoteService
 
     # SDK 1.2.2 has no public per-client intents argument and otherwise requests
     # unrelated guild/interaction privileges. Keep this pinned-version project
@@ -322,6 +332,69 @@ async def run_bot(settings: Settings) -> None:
             menus,
             DailyDrawCardRenderer(RESOURCE_DIR / "daily_draw_assets"),
         )
+        trickcal_refresh_task: asyncio.Task[None] | None = None
+        trickcal_web_server: Any | None = None
+        if settings.trickcal_mode == "remote":
+            if settings.trickcal_remote_configured:
+                try:
+                    trickcal_client = TrickcalClient(
+                        http_client,
+                        api_base_url=settings.trickcal_api_base_url,
+                        bot_api_key=settings.trickcal_bot_api_key,
+                    )
+                except ValueError as exc:
+                    logger.warning("[TRICKCAL] remote config invalid, module disabled | reason=%s", exc)
+                    trickcal_controller = TrickcalController(None, menus, mode="disabled")
+                else:
+                    trickcal_controller = TrickcalController(
+                        TrickcalRemoteService(trickcal_client), menus, mode="remote"
+                    )
+                    logger.info("[TRICKCAL] remote client initialized")
+            else:
+                trickcal_controller = TrickcalController(None, menus, mode="disabled")
+                logger.warning("[TRICKCAL] remote config incomplete, module disabled")
+        elif settings.trickcal_mode == "local":
+            # The website is the production owner.  This path is deliberately
+            # opt-in so legacy local SQLite/Web stays available for rollback.
+            from trickcal.legacy import (
+                LocalBoardWeb,
+                LocalBoardWebServer,
+                LocalCatalogService,
+                LocalTrickcalBoardService,
+                LocalTrickcalRepository,
+            )
+
+            trickcal_repository = LocalTrickcalRepository(
+                APP_DIR / "data" / "trickcal.sqlite3"
+            )
+            await trickcal_repository.initialize()
+            trickcal_catalog = LocalCatalogService(trickcal_repository, http_client)
+            trickcal_service = LocalTrickcalBoardService(
+                trickcal_repository,
+                trickcal_catalog,
+                public_url=settings.trickcal_web_public_url,
+                ticket_minutes=settings.trickcal_login_ticket_minutes,
+                session_days=settings.trickcal_web_session_days,
+            )
+            trickcal_controller = TrickcalController(trickcal_service, menus, mode="local")
+            trickcal_web_server = LocalBoardWebServer(
+                LocalBoardWeb(trickcal_service, secure_cookie=settings.trickcal_web_secure_cookie)
+            )
+            if (
+                settings.trickcal_web_public_url.startswith("https://")
+                and not settings.trickcal_web_secure_cookie
+            ):
+                logger.warning(
+                    "[TRICKCAL] HTTPS legacy public URL configured but secure cookie is disabled"
+                )
+            await trickcal_web_server.start()
+            trickcal_refresh_task = asyncio.create_task(
+                trickcal_catalog.refresh_worker(), name="trickcal-catalog-refresh"
+            )
+            logger.warning("[TRICKCAL] legacy local web service listening on 127.0.0.1:8080")
+        else:
+            trickcal_controller = TrickcalController(None, menus, mode="disabled")
+            logger.info("[TRICKCAL] module disabled by TRICKCAL_MODE")
         steam_monitor = SteamMonitor(settings.steam_monitor_enabled)
         if steam_monitor.enabled:
             logger.warning(
@@ -361,6 +434,7 @@ async def run_bot(settings: Settings) -> None:
                     gift_handler=gift_controller.handle_text,
                     draw_handler=draw_controller.handle_text,
                     menu_handler=menus.handle_text,
+                    trickcal_handler=trickcal_controller.handle_text,
                 )
                 logger.info(
                     "收到消息 | received_at=%s | event_type=%s | message_type=%s "
@@ -384,7 +458,7 @@ async def run_bot(settings: Settings) -> None:
         ) -> None:
             try:
                 await handle_interaction(
-                    event_type, raw, api, menus, steam_controller
+                    event_type, raw, api, menus, steam_controller, trickcal_controller
                 )
             except Exception:
                 logger.exception("交互事件处理异常 | event_type=%s", event_type)
@@ -436,6 +510,12 @@ async def run_bot(settings: Settings) -> None:
             await shutdown.wait()
         finally:
             logger.info("正在关闭机器人连接")
+            if trickcal_refresh_task is not None:
+                trickcal_refresh_task.cancel()
+                with suppress(asyncio.CancelledError):
+                    await trickcal_refresh_task
+            if trickcal_web_server is not None:
+                await trickcal_web_server.stop()
             await websocket.async_stop()
 
 

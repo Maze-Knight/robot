@@ -22,10 +22,20 @@ try {
         --clean `
         --onefile `
         --console `
+        --hidden-import "trickcal.legacy" `
         --add-data "daily_draw_assets;daily_draw_assets" `
         --name "ElenaBot" `
         main.py
     if ($LASTEXITCODE -ne 0) { throw "Failed to build the EXE." }
+
+    & $PythonExe -m PyInstaller `
+        --noconfirm `
+        --clean `
+        --onefile `
+        --windowed `
+        --name "ElenaManager" `
+        manager.py
+    if ($LASTEXITCODE -ne 0) { throw "Failed to build the management EXE." }
 
     Copy-Item -LiteralPath ".env.example" -Destination "dist\.env.example" -Force
     Copy-Item -LiteralPath "DEPLOY_WINDOWS.md" -Destination "dist\DEPLOY_WINDOWS.md" -Force
@@ -35,6 +45,7 @@ try {
 
     Write-Host ""
     Write-Host "Build complete: $ProjectRoot\dist\ElenaBot.exe"
+    Write-Host "Management terminal: $ProjectRoot\dist\ElenaManager.exe"
     Write-Host "Deploy the dist folder, rename .env.example to .env, and fill in real settings."
 } finally {
     Pop-Location

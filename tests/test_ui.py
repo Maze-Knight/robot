@@ -104,6 +104,7 @@ class KeyboardTests(unittest.TestCase):
                 "/礼包查询",
                 "/每日抽取",
                 "/图鉴",
+                "/蜡笔板",
                 "/返回终端",
             ],
         )

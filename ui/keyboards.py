@@ -103,6 +103,11 @@ def _command_button(
     )
 
 
+def _url_button(button_id: str, label: str, url: str) -> KeyboardButton:
+    """Open a short-lived municipal web entry URL generated for this user."""
+    return _button(button_id, label, url, action_type=0, style=1)
+
+
 def build_main_keyboard() -> InlineKeyboard:
     return _keyboard(
         [
@@ -130,8 +135,39 @@ def build_services_keyboard() -> InlineKeyboard:
                 _command_button("service_collection", "📖 图鉴", "/图鉴"),
             ],
             [
+                _command_button("service_trickcal", "🖍️ 蜡笔板", "/蜡笔板"),
+            ],
+            [
                 _command_button("service_home", "🔙 返回终端", "/返回终端", style=0),
             ],
+        ]
+    )
+
+
+def build_trickcal_keyboard() -> InlineKeyboard:
+    return _keyboard(
+        [
+            [_button("trickcal_open", "🌐 打开蜡笔板", "trickcal:open")],
+            [_button("trickcal_progress", "📊 我的进度", "trickcal:progress")],
+            [_button("trickcal_back", "🔙 返回市政服务", "trickcal:back", style=0)],
+        ]
+    )
+
+
+def build_trickcal_empty_keyboard() -> InlineKeyboard:
+    return _keyboard(
+        [
+            [_button("trickcal_open", "🌐 打开蜡笔板", "trickcal:open")],
+            [_button("trickcal_back", "🔙 返回市政服务", "trickcal:back", style=0)],
+        ]
+    )
+
+
+def build_trickcal_login_keyboard(url: str) -> InlineKeyboard:
+    return _keyboard(
+        [
+            [_url_button("trickcal_entry", "🌐 进入个人蜡笔板", url)],
+            [_button("trickcal_login_back", "🔙 返回市政服务", "trickcal:back", style=0)],
         ]
     )
 

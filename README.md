@@ -48,6 +48,20 @@
 
 每名使徒第一次获得时以 1★ 解锁；此后每重复获得一次，培养等级增加一星。这里的星数只表示累计抽到次数，不代表稀有度。抽取记录、图鉴数量和升星在同一个 SQLite 事务中提交。
 
+### 🖍️ 嘟嘟脸蜡笔板
+
+入口为“莫纳提姆市政终端 → 市政服务 → 🖍️ 蜡笔板”。默认 `TRICKCAL_MODE=remote`：机器人只将 QQ 官方身份原样交给礼包网站的 HTTPS Bot API，取得网页登录入口或个人摘要；网页、鉴权、票据、资料与数据库均由网站负责。
+
+```dotenv
+TRICKCAL_MODE=remote
+TRICKCAL_API_BASE_URL=https://gift.example.com
+TRICKCAL_BOT_API_KEY=请填写强随机服务密钥
+```
+
+群聊传 `member_openid + group`，C2C 传 `openid + c2c`，机器人不会猜测它们是否是同一身份。API 返回的入口必须为 HTTPS 且域名与配置域名一致，避免异常响应跳转到不可信网站。缺少远程配置时 QQ Gateway 仍会启动，蜡笔板仅提示尚未接入。
+
+旧的本地 Web/SQLite 实现保留为 `TRICKCAL_MODE=local` 的开发与回滚路径，默认不启动 `127.0.0.1:8080`。其旧配置为 **LEGACY ONLY**，来源审计与许可证边界记录见 [NOTICE_TRICKCAL.md](NOTICE_TRICKCAL.md)。
+
 ## 技术选择（调研日期：2026-09-11）
 
 采用：
@@ -168,6 +182,8 @@ powershell -ExecutionPolicy Bypass -File .\build_exe.ps1
 `.env.example` 改名为 `.env` 并填写真实配置，然后双击 `ElenaBot.exe`。
 EXE 不包含任何真实凭证，且带有单实例锁，重复启动不会造成重复回复。
 完整步骤见 [DEPLOY_WINDOWS.md](DEPLOY_WINDOWS.md)。
+
+构建也会生成 `dist\ElenaManager.exe`。它是 Windows 本机管理终端：可以编辑部署目录的 `.env`、启动或停止由它启动的机器人、执行 Git 状态/安全拉取，并在确认后提交推送。Git 操作只对含 `.git` 的完整仓库可用；单独复制到服务器的 `dist` 不会被误认为仓库。
 
 也可不创建 `.env`，仅对当前 PowerShell 会话设置环境变量：
 

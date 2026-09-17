@@ -15,6 +15,7 @@ data/*.lock
 build/
 dist/*
 !dist/ElenaBot.exe
+!dist/ElenaManager.exe
 !dist/.env.example
 !dist/DEPLOY_WINDOWS.md
 !dist/daily_draw_pool.json
