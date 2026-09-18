@@ -222,13 +222,14 @@ class MenuService:
         *,
         reply_to: str | None = None,
         event_id: str | None = None,
+        content: str | None = None,
     ) -> dict[str, Any]:
         from trickcal import copywriting as trickcal_copy
 
         return await self._send_markdown_keyboard(
             scene,
             chat_id,
-            trickcal_copy.EMPTY,
+            content or trickcal_copy.EMPTY,
             build_trickcal_empty_keyboard(),
             reply_to=reply_to,
             event_id=event_id,

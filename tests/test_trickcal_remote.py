@@ -219,6 +219,7 @@ class RemoteControllerTests(unittest.IsolatedAsyncioTestCase):
         handled = await TrickcalController(service, menus, mode="remote").handle_text(Context())
         self.assertTrue(handled)
         self.assertEqual(menus.calls[0][0], "login")
+        self.assertEqual(menus.calls[0][1][2], f"<@member-openid>\n{copy.FIRST_ENTRY}")
         self.assertEqual(menus.calls[0][2]["reply_to"], "message-id")
         self.assertEqual(service.identity.user_id, "member-openid")
 
@@ -232,7 +233,7 @@ class RemoteControllerTests(unittest.IsolatedAsyncioTestCase):
         controller = TrickcalController(None, menus, mode="disabled")
         await controller.handle_interaction("group", "group-openid", "member-openid", "trickcal:open", "event")
         self.assertEqual(menus.calls[0][0], "text")
-        self.assertEqual(menus.calls[0][1][2], copy.UNAVAILABLE)
+        self.assertEqual(menus.calls[0][1][2], f"<@member-openid>\n{copy.UNAVAILABLE}")
 
     async def test_remote_profile_absent_uses_open_and_back_view(self) -> None:
         class Service:
@@ -244,6 +245,7 @@ class RemoteControllerTests(unittest.IsolatedAsyncioTestCase):
         controller = TrickcalController(service, menus, mode="remote")
         await controller.handle_interaction("group", "group-openid", "member-openid", "trickcal:progress", "event")
         self.assertEqual(menus.calls[0][0], "empty")
+        self.assertEqual(menus.calls[0][2]["content"], f"<@member-openid>\n{copy.EMPTY}")
         self.assertEqual(service.identity.scene_type, "group")
         self.assertEqual(service.identity.user_id, "member-openid")
 
@@ -259,6 +261,7 @@ class RemoteControllerTests(unittest.IsolatedAsyncioTestCase):
         controller = TrickcalController(service, menus, mode="remote")
         await controller.handle_interaction("c2c", "openid", "openid", "trickcal:open", "event")
         self.assertEqual(menus.calls[0][0], "login")
+        self.assertEqual(menus.calls[0][1][2], copy.FIRST_ENTRY)
         self.assertEqual(service.identity.scene_type, "c2c")
 
     async def test_open_is_debounced_per_user(self) -> None:
