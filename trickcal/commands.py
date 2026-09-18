@@ -15,10 +15,18 @@ logger = logging.getLogger("elena.qq.trickcal.commands")
 class TrickcalController:
     """Routes QQ interactions without embedding remote HTTP response schemas."""
 
-    def __init__(self, service: Any | None, menus: Any, *, mode: str | None = None) -> None:
+    def __init__(
+        self,
+        service: Any | None,
+        menus: Any,
+        *,
+        mode: str | None = None,
+        progress_card_renderer: Any = None,
+    ) -> None:
         self._service = service
         self._menus = menus
         self._mode = mode or ("local" if hasattr(service, "issue_entry") else "remote")
+        self._progress_card_renderer = progress_card_renderer
         self._last_action: dict[tuple[str, str], float] = {}
 
     async def handle_text(self, context: Any) -> bool:
@@ -97,11 +105,30 @@ class TrickcalController:
                 content=self._address(scene, context.user_id, copy.EMPTY),
             )
             return
+        await self._send_text_progress(context, scene, chat_id, summary)
+
+    async def _send_text_progress(
+        self, context: Any, scene: str, chat_id: str, summary: Any
+    ) -> None:
+        content = TrickcalFormatter.summary(summary)
+        if self._progress_card_renderer is not None and len(summary.attribute_stats) == 5:
+            try:
+                image = self._progress_card_renderer.render(summary)
+                await self._menus.send_image(
+                    scene,
+                    chat_id,
+                    image,
+                    reply_to=context.message_id,
+                    file_name="trickcal-progress.png",
+                )
+                content = copy.PROGRESS_CARD_READY
+            except Exception:
+                logger.exception("[TRICKCAL] progress card failed; falling back to text")
         await self._menus.send_trickcal_home(
             scene,
             chat_id,
             reply_to=context.message_id,
-            content=self._address(scene, context.user_id, TrickcalFormatter.summary(summary)),
+            content=self._address(scene, context.user_id, content),
         )
 
     async def handle_interaction(self, scene: str, chat_id: str, user_id: str, button_data: str, event_id: str | None) -> None:

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+import math
 from typing import Any
 
 
@@ -45,6 +46,17 @@ class LoginTicketResponse:
 
 
 @dataclass(frozen=True, slots=True)
+class TrickcalAttributeStat:
+    """One website-calculated attribute group for the QQ progress card."""
+
+    key: str
+    label: str
+    lit_nodes: int
+    total_nodes: int
+    bonus_percent: float
+
+
+@dataclass(frozen=True, slots=True)
 class TrickcalSummary:
     profile_exists: bool | None = None
     owned_characters: int | None = None
@@ -54,6 +66,8 @@ class TrickcalSummary:
     planned_nodes: int | None = None
     gold_required: int | None = None
     gold_crayons_required: int | None = None
+    gold_crayons_used: int | None = None
+    attribute_stats: tuple[TrickcalAttributeStat, ...] = ()
     updated_at: str | None = None
 
     @classmethod
@@ -69,6 +83,49 @@ class TrickcalSummary:
             except (TypeError, ValueError):
                 return None
 
+        def optional_percent(value: Any) -> float | None:
+            if isinstance(value, bool):
+                return None
+            try:
+                parsed = float(value)
+            except (TypeError, ValueError):
+                return None
+            return parsed if math.isfinite(parsed) else None
+
+        attribute_stats: list[TrickcalAttributeStat] = []
+        raw_stats = payload.get("attribute_stats")
+        if isinstance(raw_stats, list):
+            for item in raw_stats:
+                if not isinstance(item, dict):
+                    continue
+                key = item.get("key")
+                label = item.get("label")
+                lit_nodes = item.get("lit_nodes")
+                total_nodes = item.get("total_nodes")
+                bonus_percent = optional_percent(item.get("bonus_percent"))
+                if (
+                    not isinstance(key, str)
+                    or not key
+                    or not isinstance(label, str)
+                    or not label
+                    or isinstance(lit_nodes, bool)
+                    or isinstance(total_nodes, bool)
+                    or bonus_percent is None
+                ):
+                    continue
+                try:
+                    attribute_stats.append(
+                        TrickcalAttributeStat(
+                            key=key,
+                            label=label,
+                            lit_nodes=max(0, int(lit_nodes)),
+                            total_nodes=max(0, int(total_nodes)),
+                            bonus_percent=bonus_percent,
+                        )
+                    )
+                except (TypeError, ValueError):
+                    continue
+
         exists = payload.get("profile_exists")
         return cls(
             profile_exists=exists if isinstance(exists, bool) else None,
@@ -79,5 +136,7 @@ class TrickcalSummary:
             planned_nodes=optional_int("planned_nodes"),
             gold_required=optional_int("gold_required"),
             gold_crayons_required=optional_int("gold_crayons_required"),
+            gold_crayons_used=optional_int("gold_crayons_used"),
+            attribute_stats=tuple(attribute_stats),
             updated_at=payload.get("updated_at") if isinstance(payload.get("updated_at"), str) else None,
         )

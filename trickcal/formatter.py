@@ -21,11 +21,9 @@ class TrickcalFormatter:
             lines.append(f"计划节点：{summary.planned_nodes}")
 
         resources: list[str] = []
-        if summary.gold_required is not None:
-            resources.append(f"金币：{summary.gold_required:,}")
         if summary.gold_crayons_required is not None:
-            resources.append(f"金蜡笔：{summary.gold_crayons_required:,}")
+            resources.append(f"预计还需金蜡笔：{summary.gold_crayons_required:,}")
         if resources:
-            lines.extend(("", "预计还需：", *resources))
+            lines.extend(("", *resources))
         lines.extend(("", "数据正常。至少这张表还在按规划工作。"))
         return "\n".join(lines)

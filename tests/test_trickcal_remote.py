@@ -4,7 +4,7 @@ import logging
 import os
 import unittest
 from typing import Any
-from unittest.mock import patch
+from unittest.mock import Mock, patch
 
 import httpx
 
@@ -20,8 +20,9 @@ from trickcal.client import (
     TrickcalUnavailableError,
 )
 from trickcal.commands import TrickcalController
+from trickcal.card import TrickcalProgressCardRenderer
 from trickcal.formatter import TrickcalFormatter
-from trickcal.models import TrickcalIdentity, TrickcalSummary
+from trickcal.models import TrickcalAttributeStat, TrickcalIdentity, TrickcalSummary
 from trickcal.remote_service import TrickcalRemoteService
 from ui.keyboards import build_trickcal_keyboard
 
@@ -121,6 +122,33 @@ class RemoteClientTests(unittest.IsolatedAsyncioTestCase):
         )
         self.assertFalse((await client.get_summary(identity())).profile_exists)
 
+    async def test_summary_parses_attribute_statistics_and_crayons(self) -> None:
+        client = await self._client(
+            lambda request: httpx.Response(
+                200,
+                json={
+                    "ok": True,
+                    "profile_exists": True,
+                    "gold_crayons_required": 76,
+                    "gold_crayons_used": 12,
+                    "attribute_stats": [
+                        {
+                            "key": "attack",
+                            "label": "攻击力",
+                            "lit_nodes": 4,
+                            "total_nodes": 144,
+                            "bonus_percent": 12,
+                        }
+                    ],
+                },
+            )
+        )
+        summary = await client.get_summary(identity())
+        self.assertEqual(summary.gold_crayons_required, 76)
+        self.assertEqual(summary.gold_crayons_used, 12)
+        self.assertEqual(summary.attribute_stats[0].label, "攻击力")
+        self.assertEqual(summary.attribute_stats[0].bonus_percent, 12)
+
     async def test_api_errors_are_typed(self) -> None:
         cases = [
             (401, {}, TrickcalAuthError),
@@ -171,9 +199,40 @@ class RemoteFormatterTests(unittest.TestCase):
     def test_formatter_displays_only_fields_returned_by_website(self) -> None:
         text = TrickcalFormatter.summary(TrickcalSummary(profile_exists=True, owned_characters=46, total_characters=63, gold_required=1_280_000))
         self.assertIn("已登记角色：46 / 63", text)
-        self.assertIn("金币：1,280,000", text)
+        self.assertNotIn("金币", text)
         self.assertNotIn("已完成节点", text)
         self.assertNotIn("金蜡笔：0", text)
+
+    def test_formatter_keeps_only_remaining_gold_crayons(self) -> None:
+        text = TrickcalFormatter.summary(
+            TrickcalSummary(gold_required=1_280_000, gold_crayons_required=76)
+        )
+        self.assertIn("预计还需金蜡笔：76", text)
+        self.assertNotIn("金币", text)
+
+    def test_progress_card_renders_attribute_statistics(self) -> None:
+        stats = tuple(
+            TrickcalAttributeStat(key, label, index, 100 + index, index * 3)
+            for index, (key, label) in enumerate(
+                (("attack", "攻击力"), ("critical", "暴击"), ("health", "生命值"), ("defense", "防御力"), ("critical_resistance", "暴击抗性")),
+                start=1,
+            )
+        )
+        rendered = TrickcalProgressCardRenderer().render(
+            TrickcalSummary(
+                completed_nodes=18,
+                total_nodes=702,
+                gold_crayons_used=12,
+                gold_crayons_required=76,
+                attribute_stats=stats,
+            )
+        )
+        from PIL import Image
+        import io
+
+        with Image.open(io.BytesIO(rendered)) as image:
+            self.assertEqual(image.size, (960, 940))
+            self.assertEqual(image.format, "PNG")
 
 
 class Menus:
@@ -188,6 +247,9 @@ class Menus:
 
     async def send_trickcal_empty(self, *args: Any, **kwargs: Any) -> None:
         self.calls.append(("empty", args, kwargs))
+
+    async def send_image(self, *args: Any, **kwargs: Any) -> None:
+        self.calls.append(("image", args, kwargs))
 
     async def send_services_menu(self, *args: Any, **kwargs: Any) -> None:
         self.calls.append(("services", args, kwargs))
@@ -248,6 +310,49 @@ class RemoteControllerTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(menus.calls[0][2]["content"], f"<@member-openid>\n{copy.EMPTY}")
         self.assertEqual(service.identity.scene_type, "group")
         self.assertEqual(service.identity.user_id, "member-openid")
+
+    async def test_text_progress_sends_attribute_card_then_addressed_menu(self) -> None:
+        stats = tuple(
+            TrickcalAttributeStat(key, label, 1, 10, 2)
+            for key, label in (
+                ("attack", "攻击力"),
+                ("critical", "暴击"),
+                ("health", "生命值"),
+                ("defense", "防御力"),
+                ("critical_resistance", "暴击抗性"),
+            )
+        )
+
+        class Service:
+            async def get_summary(self, value: TrickcalIdentity) -> TrickcalSummary:
+                return TrickcalSummary(
+                    profile_exists=True,
+                    completed_nodes=5,
+                    total_nodes=50,
+                    attribute_stats=stats,
+                )
+
+        class Context:
+            scene_type = "group"
+            group_id = "group-openid"
+            user_id = "member-openid"
+            message_id = "message-id"
+            content = "/蜡笔板进度"
+
+            async def reply(self, content: str) -> None:
+                raise AssertionError(f"unexpected plain reply: {content}")
+
+        menus = Menus()
+        renderer = Mock(render=Mock(return_value=b"card-png"))
+        handled = await TrickcalController(
+            Service(), menus, mode="remote", progress_card_renderer=renderer
+        ).handle_text(Context())
+
+        self.assertTrue(handled)
+        self.assertEqual([call[0] for call in menus.calls], ["image", "home"])
+        self.assertEqual(menus.calls[0][1][2], b"card-png")
+        self.assertEqual(menus.calls[0][2]["reply_to"], "message-id")
+        self.assertEqual(menus.calls[1][2]["content"], f"<@member-openid>\n{copy.PROGRESS_CARD_READY}")
 
     async def test_remote_open_uses_service_ticket_and_c2c_identity(self) -> None:
         class Service:

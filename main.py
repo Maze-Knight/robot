@@ -301,6 +301,7 @@ async def run_bot(settings: Settings) -> None:
         )
         steam_service = SteamService(steam_client, steam_repository)
         from steam.card import SteamCardRenderer
+        from trickcal.card import TrickcalProgressCardRenderer
 
         steam_card_renderer = SteamCardRenderer(http_client)
         steam_controller = SteamController(
@@ -347,7 +348,10 @@ async def run_bot(settings: Settings) -> None:
                     trickcal_controller = TrickcalController(None, menus, mode="disabled")
                 else:
                     trickcal_controller = TrickcalController(
-                        TrickcalRemoteService(trickcal_client), menus, mode="remote"
+                        TrickcalRemoteService(trickcal_client),
+                        menus,
+                        mode="remote",
+                        progress_card_renderer=TrickcalProgressCardRenderer(),
                     )
                     logger.info("[TRICKCAL] remote client initialized")
             else:
