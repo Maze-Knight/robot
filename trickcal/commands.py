@@ -22,10 +22,72 @@ class TrickcalController:
         self._last_action: dict[tuple[str, str], float] = {}
 
     async def handle_text(self, context: Any) -> bool:
-        if context.content.strip().casefold() not in {"/蜡笔板", "蜡笔板"}:
-            return False
-        await self._menus.send_trickcal_home(context.scene_type, context.group_id or context.user_id, context.message_id)
-        return True
+        command = context.content.strip().casefold()
+        scene = context.scene_type
+        chat_id = context.group_id or context.user_id
+        if command in {"/蜡笔板", "蜡笔板"}:
+            await self._menus.send_trickcal_home(scene, chat_id, context.message_id)
+            return True
+        if command == "/打开蜡笔板":
+            await self._handle_text_open(context, scene, chat_id)
+            return True
+        if command == "/蜡笔板进度":
+            await self._handle_text_progress(context, scene, chat_id)
+            return True
+        return False
+
+    async def _handle_text_open(self, context: Any, scene: str, chat_id: str) -> None:
+        if not await self._allow(context.user_id, "open", 3.0):
+            await context.reply(copy.TOO_FAST)
+            return
+        if self._service is None or self._mode == "disabled":
+            await context.reply(copy.UNAVAILABLE)
+            return
+        try:
+            url = await self._entry_url(scene, context.user_id)
+            await self._menus.send_trickcal_login(
+                scene,
+                chat_id,
+                copy.FIRST_ENTRY,
+                url,
+                reply_to=context.message_id,
+            )
+        except Exception:
+            logger.exception("[TRICKCAL] login ticket command failed")
+            await context.reply(copy.ENTRY_FAILED)
+
+    async def _handle_text_progress(self, context: Any, scene: str, chat_id: str) -> None:
+        if not await self._allow(context.user_id, "progress", 2.0):
+            await context.reply(copy.TOO_FAST)
+            return
+        if self._service is None or self._mode == "disabled":
+            await context.reply(copy.UNAVAILABLE)
+            return
+        if self._mode == "local":
+            await self._legacy_progress(scene, chat_id, context.user_id, None)
+            return
+        try:
+            summary = await self._service.get_summary(self._identity(scene, context.user_id))
+        except TrickcalProfileNotFoundError:
+            await self._menus.send_trickcal_empty(scene, chat_id, reply_to=context.message_id)
+            return
+        except TrickcalError:
+            logger.exception("[TRICKCAL] summary command failed")
+            await context.reply(copy.ENTRY_FAILED)
+            return
+        except Exception:
+            logger.exception("[TRICKCAL] unexpected summary command failure")
+            await context.reply(copy.ENTRY_FAILED)
+            return
+        if summary.profile_exists is False:
+            await self._menus.send_trickcal_empty(scene, chat_id, reply_to=context.message_id)
+            return
+        await self._menus.send_trickcal_home(
+            scene,
+            chat_id,
+            reply_to=context.message_id,
+            content=TrickcalFormatter.summary(summary),
+        )
 
     async def handle_interaction(self, scene: str, chat_id: str, user_id: str, button_data: str, event_id: str | None) -> None:
         if button_data == "trickcal:home":

@@ -23,6 +23,7 @@ from trickcal.commands import TrickcalController
 from trickcal.formatter import TrickcalFormatter
 from trickcal.models import TrickcalIdentity, TrickcalSummary
 from trickcal.remote_service import TrickcalRemoteService
+from ui.keyboards import build_trickcal_keyboard
 
 
 def identity(scene: str = "group") -> TrickcalIdentity:
@@ -196,6 +197,36 @@ class Menus:
 
 
 class RemoteControllerTests(unittest.IsolatedAsyncioTestCase):
+    async def test_command_button_open_uses_passive_message_reply(self) -> None:
+        class Service:
+            async def create_login_ticket(self, value: TrickcalIdentity):
+                from trickcal.models import LoginTicketResponse
+
+                self.identity = value
+                return LoginTicketResponse("https://gift.example.com/tr-board/entry?t=private")
+
+        class Context:
+            scene_type = "group"
+            group_id = "group-openid"
+            user_id = "member-openid"
+            message_id = "message-id"
+            content = "/打开蜡笔板"
+
+            async def reply(self, content: str) -> None:
+                raise AssertionError(f"unexpected plain reply: {content}")
+
+        menus = Menus(); service = Service()
+        handled = await TrickcalController(service, menus, mode="remote").handle_text(Context())
+        self.assertTrue(handled)
+        self.assertEqual(menus.calls[0][0], "login")
+        self.assertEqual(menus.calls[0][2]["reply_to"], "message-id")
+        self.assertEqual(service.identity.user_id, "member-openid")
+
+    def test_trickcal_buttons_emit_chinese_passive_commands(self) -> None:
+        buttons = build_trickcal_keyboard().to_dict()["content"]["rows"]
+        actions = [item["buttons"][0]["action"] for item in buttons]
+        self.assertEqual([item["type"] for item in actions], [2, 2, 2])
+        self.assertEqual([item["data"] for item in actions], ["/打开蜡笔板", "/蜡笔板进度", "/市政服务"])
     async def test_disabled_module_keeps_menu_but_reports_unavailable_on_open(self) -> None:
         menus = Menus()
         controller = TrickcalController(None, menus, mode="disabled")

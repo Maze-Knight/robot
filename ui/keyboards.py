@@ -147,9 +147,9 @@ def build_services_keyboard() -> InlineKeyboard:
 def build_trickcal_keyboard() -> InlineKeyboard:
     return _keyboard(
         [
-            [_button("trickcal_open", "🌐 打开蜡笔板", "trickcal:open")],
-            [_button("trickcal_progress", "📊 我的进度", "trickcal:progress")],
-            [_button("trickcal_back", "🔙 返回市政服务", "trickcal:back", style=0)],
+            [_command_button("trickcal_open", "🌐 打开蜡笔板", "/打开蜡笔板")],
+            [_command_button("trickcal_progress", "📊 我的进度", "/蜡笔板进度")],
+            [_command_button("trickcal_back", "🔙 返回市政服务", "/市政服务", style=0)],
         ]
     )
 
@@ -157,8 +157,8 @@ def build_trickcal_keyboard() -> InlineKeyboard:
 def build_trickcal_empty_keyboard() -> InlineKeyboard:
     return _keyboard(
         [
-            [_button("trickcal_open", "🌐 打开蜡笔板", "trickcal:open")],
-            [_button("trickcal_back", "🔙 返回市政服务", "trickcal:back", style=0)],
+            [_command_button("trickcal_open", "🌐 打开蜡笔板", "/打开蜡笔板")],
+            [_command_button("trickcal_back", "🔙 返回市政服务", "/市政服务", style=0)],
         ]
     )
 
