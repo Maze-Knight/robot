@@ -121,7 +121,7 @@ class TrickcalController:
                     reply_to=context.message_id,
                     file_name="trickcal-progress.png",
                 )
-                content = copy.PROGRESS_CARD_READY
+                return
             except Exception:
                 logger.exception("[TRICKCAL] progress card failed; falling back to text")
         await self._menus.send_trickcal_home(

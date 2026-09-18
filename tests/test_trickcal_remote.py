@@ -317,7 +317,7 @@ class RemoteControllerTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(service.identity.scene_type, "group")
         self.assertEqual(service.identity.user_id, "member-openid")
 
-    async def test_text_progress_sends_attribute_card_then_addressed_menu(self) -> None:
+    async def test_text_progress_sends_only_attribute_card(self) -> None:
         stats = tuple(
             TrickcalAttributeStat(key, label, 1, 10, 2)
             for key, label in (
@@ -355,10 +355,9 @@ class RemoteControllerTests(unittest.IsolatedAsyncioTestCase):
         ).handle_text(Context())
 
         self.assertTrue(handled)
-        self.assertEqual([call[0] for call in menus.calls], ["image", "home"])
+        self.assertEqual([call[0] for call in menus.calls], ["image"])
         self.assertEqual(menus.calls[0][1][2], b"card-png")
         self.assertEqual(menus.calls[0][2]["reply_to"], "message-id")
-        self.assertEqual(menus.calls[1][2]["content"], f"<@member-openid>\n{copy.PROGRESS_CARD_READY}")
 
     async def test_remote_open_uses_service_ticket_and_c2c_identity(self) -> None:
         class Service:
