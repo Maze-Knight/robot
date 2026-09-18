@@ -275,6 +275,54 @@ class MenuTests(unittest.IsolatedAsyncioTestCase):
             markdown=True,
         )
 
+    async def test_chinese_help_alias_reuses_help_menu(self) -> None:
+        message = Mock()
+        api = SimpleNamespace(
+            build_text_body=Mock(return_value=message),
+            post_group_message=AsyncMock(return_value={"id": "help-menu"}),
+        )
+        menus = MenuService(api, TerminalStatus())
+        context = SimpleNamespace(
+            content="/帮助",
+            scene_type="group",
+            group_id="group-openid",
+            user_id="member-openid",
+            message_id="help-command-message-id",
+            reply=AsyncMock(),
+        )
+
+        self.assertTrue(await menus.handle_text(context))
+
+        api.build_text_body.assert_called_once_with(
+            copy.HELP_MARKDOWN,
+            reply_to="help-command-message-id",
+            markdown=True,
+        )
+
+    async def test_bare_help_panel_command_reuses_help_menu(self) -> None:
+        message = Mock()
+        api = SimpleNamespace(
+            build_text_body=Mock(return_value=message),
+            post_group_message=AsyncMock(return_value={"id": "help-menu"}),
+        )
+        menus = MenuService(api, TerminalStatus())
+        context = SimpleNamespace(
+            content="帮助",
+            scene_type="group",
+            group_id="group-openid",
+            user_id="member-openid",
+            message_id="help-command-message-id",
+            reply=AsyncMock(),
+        )
+
+        self.assertTrue(await menus.handle_text(context))
+
+        api.build_text_body.assert_called_once_with(
+            copy.HELP_MARKDOWN,
+            reply_to="help-command-message-id",
+            markdown=True,
+        )
+
     async def test_group_image_upload_is_followed_by_passive_media_reply(self) -> None:
         api = SimpleNamespace(
             upload_group_file=AsyncMock(return_value={"file_info": "media-token"}),

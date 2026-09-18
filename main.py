@@ -19,7 +19,7 @@ from runtime import APP_DIR, RESOURCE_DIR, AlreadyRunningError, InstanceLock
 BOT_NAME = "艾琳娜"
 REPLY_TEXT = "艾琳娜收到啦！"
 TRIGGERS = {"测试", "ping"}
-MENU_TRIGGERS = {"菜单", "/help", "/menu"}
+MENU_TRIGGERS = {"菜单", "/菜单", "/help", "/menu"}
 MARKDOWN_TRIGGER = "/test-markdown"
 LOG_DIR = APP_DIR / "logs"
 logger = logging.getLogger("elena.qq")
@@ -245,6 +245,7 @@ async def run_bot(settings: Settings) -> None:
         QQWebSocket,
         WSCallbacks,
     )
+    from command_panels import CommandPanelSynchronizer
     from ui.interactions import handle_interaction
     from ui.menus import MenuService, TerminalStatus
     from steam.client import SteamClient
@@ -508,6 +509,12 @@ async def run_bot(settings: Settings) -> None:
         logger.info("当前连接状态：AUTHENTICATING")
         await api.ensure_token()
         logger.info("AppID / AppSecret 鉴权成功（敏感凭证未输出）")
+        try:
+            await CommandPanelSynchronizer(api).sync_all()
+        except Exception:
+            # Command panels are a discovery convenience; a temporary panel
+            # API failure must not prevent the established bot from starting.
+            logger.exception("[COMMAND_PANEL] synchronization failed; continuing startup")
         gateway_url = await api.get_gateway_url()
         logger.info("当前连接状态：CONNECTING")
         websocket.start(gateway_url, main_loop)

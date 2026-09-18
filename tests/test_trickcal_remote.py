@@ -359,6 +359,27 @@ class RemoteControllerTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(menus.calls[0][1][2], b"card-png")
         self.assertEqual(menus.calls[0][2]["reply_to"], "message-id")
 
+    async def test_short_progress_alias_reuses_existing_progress_handler(self) -> None:
+        class Service:
+            async def get_summary(self, value: TrickcalIdentity) -> TrickcalSummary:
+                return TrickcalSummary(profile_exists=False)
+
+        class Context:
+            scene_type = "group"
+            group_id = "group-openid"
+            user_id = "member-openid"
+            message_id = "message-id"
+            content = "蜡笔进度"
+
+            async def reply(self, content: str) -> None:
+                raise AssertionError(f"unexpected plain reply: {content}")
+
+        menus = Menus()
+        handled = await TrickcalController(Service(), menus, mode="remote").handle_text(Context())
+
+        self.assertTrue(handled)
+        self.assertEqual(menus.calls[0][0], "empty")
+
     async def test_remote_open_uses_service_ticket_and_c2c_identity(self) -> None:
         class Service:
             async def create_login_ticket(self, value: TrickcalIdentity):

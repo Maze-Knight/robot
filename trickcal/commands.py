@@ -44,7 +44,7 @@ class TrickcalController:
         if command == "/打开蜡笔板":
             await self._handle_text_open(context, scene, chat_id)
             return True
-        if command == "/蜡笔板进度":
+        if command in {"/蜡笔板进度", "/蜡笔进度", "蜡笔进度"}:
             await self._handle_text_progress(context, scene, chat_id)
             return True
         return False

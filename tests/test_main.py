@@ -52,6 +52,25 @@ class MessageHandlerTests(unittest.IsolatedAsyncioTestCase):
 
         reply.assert_not_awaited()
 
+    async def test_chinese_slash_menu_uses_existing_main_menu_handler(self) -> None:
+        show_menu = AsyncMock(return_value={"id": "menu"})
+        context = MessageContext(
+            platform="qq_official",
+            scene_type="group",
+            group_id="group-openid",
+            user_id="member-openid",
+            message_id="message-menu",
+            content="/菜单",
+            event_type="GROUP_AT_MESSAGE_CREATE",
+            message_type=0,
+            reply=AsyncMock(),
+            show_main_menu=show_menu,
+        )
+
+        await handle_message(context)
+
+        show_menu.assert_awaited_once_with()
+
     async def test_unmatched_plugin_falls_through_to_menu_handler(self) -> None:
         steam_handler = AsyncMock(return_value=False)
         gift_handler = AsyncMock(return_value=False)

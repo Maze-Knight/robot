@@ -75,6 +75,8 @@ class MenuService:
             "/实验项目": self.send_experiments_menu,
             "/公告记录": self.send_notices_menu,
             "/使用说明": self.send_help_menu,
+            "/帮助": self.send_help_menu,
+            "帮助": self.send_help_menu,
             "/steam监测站": self.send_steam_home,
             "/蜡笔板": self.send_trickcal_home,
         }
