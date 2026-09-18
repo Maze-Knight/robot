@@ -23,6 +23,10 @@ class TrickcalProgressCardRenderer:
         ("critical_resistance", "暴击抗性", "抗", "#C36376"),
     )
 
+    def __init__(self, icon_sprite: Path) -> None:
+        self._icon_sprite = icon_sprite
+        self._icons: tuple[Image.Image, ...] | None = None
+
     @staticmethod
     def _font(size: int, *, bold: bool = False) -> ImageFont.ImageFont:
         candidates = (
@@ -80,14 +84,18 @@ class TrickcalProgressCardRenderer:
             )
             y = 510 + index * 79
             draw.rounded_rectangle((30, y, 930, y + 62), radius=19, fill="#EAE6F0")
-            draw.ellipse((52, y + 10, 94, y + 52), fill=accent)
-            badge_box = draw.textbbox((0, 0), badge, font=label_font)
-            draw.text(
-                (73 - (badge_box[2] - badge_box[0]) / 2, y + 16),
-                badge,
-                font=label_font,
-                fill="#FFFFFF",
-            )
+            icon = self._icon(index)
+            if icon is not None:
+                image.paste(icon, (50, y + 7), icon)
+            else:
+                draw.ellipse((52, y + 10, 94, y + 52), fill=accent)
+                badge_box = draw.textbbox((0, 0), badge, font=label_font)
+                draw.text(
+                    (73 - (badge_box[2] - badge_box[0]) / 2, y + 16),
+                    badge,
+                    font=label_font,
+                    fill="#FFFFFF",
+                )
             draw.text((116, y + 16), stat.label, font=row_font, fill="#243C62")
             draw.text(
                 (340, y + 20),
@@ -111,6 +119,58 @@ class TrickcalProgressCardRenderer:
         output = io.BytesIO()
         image.save(output, format="PNG", optimize=True)
         return output.getvalue()
+
+    def _icon(self, index: int) -> Image.Image | None:
+        if self._icons is None:
+            self._icons = self._load_icons()
+        return self._icons[index] if index < len(self._icons) else None
+
+    def _load_icons(self) -> tuple[Image.Image, ...]:
+        try:
+            with Image.open(self._icon_sprite) as source:
+                sprite = source.convert("RGBA")
+            icons: list[Image.Image] = []
+            for top, bottom in self._icon_bands(sprite):
+                cell = sprite.crop((0, top, sprite.width, bottom))
+                alpha = cell.getchannel("A")
+                bounds = alpha.point(
+                    lambda value: 255 if value >= 32 else 0
+                ).getbbox()
+                if bounds is None:
+                    continue
+                icon = cell.crop(bounds)
+                icon.thumbnail((50, 50), Image.Resampling.LANCZOS)
+                tile = Image.new("RGBA", (50, 50), (0, 0, 0, 0))
+                tile.paste(
+                    icon,
+                    ((50 - icon.width) // 2, (50 - icon.height) // 2),
+                    icon,
+                )
+                icons.append(tile)
+            return tuple(icons)
+        except OSError:
+            return ()
+
+    @staticmethod
+    def _icon_bands(sprite: Image.Image) -> tuple[tuple[int, int], ...]:
+        """Find the five vertically stacked icons while ignoring faint artifacts."""
+        alpha = sprite.getchannel("A")
+        active_rows = [
+            y
+            for y in range(sprite.height)
+            if sum(alpha.crop((0, y, sprite.width, y + 1)).histogram()[32:]) >= 5
+        ]
+        if not active_rows:
+            return ()
+        bands: list[tuple[int, int]] = []
+        top = bottom = active_rows[0]
+        for y in active_rows[1:]:
+            if y - bottom > 8:
+                bands.append((max(0, top - 8), min(sprite.height, bottom + 9)))
+                top = y
+            bottom = y
+        bands.append((max(0, top - 8), min(sprite.height, bottom + 9)))
+        return tuple(bands[:5])
 
     @staticmethod
     def _number(value: int | None) -> str:

@@ -3,6 +3,7 @@ from __future__ import annotations
 import logging
 import os
 import unittest
+from pathlib import Path
 from typing import Any
 from unittest.mock import Mock, patch
 
@@ -218,7 +219,12 @@ class RemoteFormatterTests(unittest.TestCase):
                 start=1,
             )
         )
-        rendered = TrickcalProgressCardRenderer().render(
+        renderer = TrickcalProgressCardRenderer(
+            Path(__file__).resolve().parents[1] / "trickcal_assets" / "attribute-icons.png"
+        )
+        self.assertEqual(len(renderer._load_icons()), 5)
+        self.assertIsNotNone(renderer._icon(0))
+        rendered = renderer.render(
             TrickcalSummary(
                 completed_nodes=18,
                 total_nodes=702,

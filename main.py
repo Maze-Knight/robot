@@ -351,7 +351,9 @@ async def run_bot(settings: Settings) -> None:
                         TrickcalRemoteService(trickcal_client),
                         menus,
                         mode="remote",
-                        progress_card_renderer=TrickcalProgressCardRenderer(),
+                        progress_card_renderer=TrickcalProgressCardRenderer(
+                            RESOURCE_DIR / "trickcal_assets" / "attribute-icons.png"
+                        ),
                     )
                     logger.info("[TRICKCAL] remote client initialized")
             else:

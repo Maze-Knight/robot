@@ -24,6 +24,7 @@ try {
         --console `
         --hidden-import "trickcal.legacy" `
         --add-data "daily_draw_assets;daily_draw_assets" `
+        --add-data "trickcal_assets;trickcal_assets" `
         --name "ElenaBot" `
         main.py
     if ($LASTEXITCODE -ne 0) { throw "Failed to build the EXE." }
