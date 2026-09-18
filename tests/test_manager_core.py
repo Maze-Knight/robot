@@ -50,3 +50,10 @@ class ManagerCoreTests(unittest.TestCase):
 
             import asyncio
             self.assertEqual(asyncio.run(check()), 401)
+
+    def test_manager_exposes_remote_trickcal_environment_keys(self) -> None:
+        from manager_core import ENVIRONMENT_KEYS
+
+        self.assertIn("TRICKCAL_MODE", ENVIRONMENT_KEYS)
+        self.assertIn("TRICKCAL_API_BASE_URL", ENVIRONMENT_KEYS)
+        self.assertIn("TRICKCAL_BOT_API_KEY", ENVIRONMENT_KEYS)
