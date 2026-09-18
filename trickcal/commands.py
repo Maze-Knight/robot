@@ -27,7 +27,7 @@ class TrickcalController:
         await self._menus.send_trickcal_home(context.scene_type, context.group_id or context.user_id, context.message_id)
         return True
 
-    async def handle_interaction(self, scene: str, chat_id: str, user_id: str, button_data: str, event_id: str) -> None:
+    async def handle_interaction(self, scene: str, chat_id: str, user_id: str, button_data: str, event_id: str | None) -> None:
         if button_data == "trickcal:home":
             await self._menus.send_trickcal_home(scene, chat_id, event_id=event_id); return
         if button_data == "trickcal:back":
@@ -82,7 +82,7 @@ class TrickcalController:
         ticket = await self._service.create_login_ticket(self._identity(scene, user_id))
         return ticket.url
 
-    async def _legacy_progress(self, scene: str, chat_id: str, user_id: str, event_id: str) -> None:
+    async def _legacy_progress(self, scene: str, chat_id: str, user_id: str, event_id: str | None) -> None:
         try:
             identity = await self._service.identity(user_id)
             summary = await self._service.get_summary(identity.id)
@@ -102,7 +102,7 @@ class TrickcalController:
             logger.exception("[TRICKCAL] local legacy summary interaction failed")
             await self._menus.send_plain_text(scene, chat_id, copy.ENTRY_FAILED, event_id=event_id)
 
-    async def _send_empty(self, scene: str, chat_id: str, event_id: str) -> None:
+    async def _send_empty(self, scene: str, chat_id: str, event_id: str | None) -> None:
         send_empty = getattr(self._menus, "send_trickcal_empty", None)
         if send_empty is None:
             await self._menus.send_trickcal_home(scene, chat_id, event_id=event_id, content=copy.EMPTY)

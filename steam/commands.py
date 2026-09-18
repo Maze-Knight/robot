@@ -121,7 +121,7 @@ class SteamController:
         chat_id: str,
         user_id: str,
         button_data: str,
-        event_id: str,
+        event_id: str | None,
     ) -> None:
         identity = self._identity(scene, user_id, chat_id)
         if button_data == "steam:home":

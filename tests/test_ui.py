@@ -311,7 +311,7 @@ class InteractionTests(unittest.IsolatedAsyncioTestCase):
             scene: str, chat_id: str, *, event_id: str | None = None
         ) -> dict[str, str]:
             self.assertEqual((scene, chat_id), ("group", "group-openid"))
-            self.assertEqual(event_id, "interaction-1")
+            self.assertIsNone(event_id)
             order.append("action")
             return {"id": "daily-menu"}
 

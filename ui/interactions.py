@@ -71,30 +71,35 @@ async def handle_interaction(
         )
         return
 
+    # acknowledge_interaction consumes the event id.  Follow-up OpenAPI
+    # messages must be ordinary group/C2C sends; attaching it again makes QQ
+    # reject the message with "请求参数event_id无效".
+    follow_up_event_id: str | None = None
+
     try:
         if button_data == "menu:services":
             await menus.send_services_menu(
-                scene, interaction.chat_id, event_id=interaction.id
+                scene, interaction.chat_id, event_id=follow_up_event_id
             )
         elif button_data == "menu:experiments":
             await menus.send_experiments_menu(
-                scene, interaction.chat_id, event_id=interaction.id
+                scene, interaction.chat_id, event_id=follow_up_event_id
             )
         elif button_data == "menu:notices":
             await menus.send_notices_menu(
-                scene, interaction.chat_id, event_id=interaction.id
+                scene, interaction.chat_id, event_id=follow_up_event_id
             )
         elif button_data == "menu:help":
             await menus.send_help_menu(
-                scene, interaction.chat_id, event_id=interaction.id
+                scene, interaction.chat_id, event_id=follow_up_event_id
             )
         elif button_data == "menu:home":
             await menus.send_main_menu(
-                scene, interaction.chat_id, event_id=interaction.id
+                scene, interaction.chat_id, event_id=follow_up_event_id
             )
         elif button_data == "notice:status":
             await menus.send_terminal_status(
-                scene, interaction.chat_id, event_id=interaction.id
+                scene, interaction.chat_id, event_id=follow_up_event_id
             )
         elif button_data.startswith("steam:") and steam_controller is not None:
             await steam_controller.handle_interaction(
@@ -102,7 +107,7 @@ async def handle_interaction(
                 interaction.chat_id,
                 interaction.operator_openid,
                 button_data,
-                interaction.id,
+                follow_up_event_id,
             )
         elif button_data.startswith("trickcal:") and trickcal_controller is not None:
             await trickcal_controller.handle_interaction(
@@ -110,25 +115,25 @@ async def handle_interaction(
                 interaction.chat_id,
                 interaction.operator_openid,
                 button_data,
-                interaction.id,
+                follow_up_event_id,
             )
         elif button_data == "menu:test":
             await menus.send_action_test_menu(
-                scene, interaction.chat_id, event_id=interaction.id
+                scene, interaction.chat_id, event_id=follow_up_event_id
             )
         elif button_data in _TEXT_ACTIONS:
             await menus.send_plain_text(
                 scene,
                 interaction.chat_id,
                 _TEXT_ACTIONS[button_data],
-                event_id=interaction.id,
+                event_id=follow_up_event_id,
             )
         else:
             await menus.send_plain_text(
                 scene,
                 interaction.chat_id,
                 f"这个按钮不在当前设计图里：{button_data or '(empty)'}",
-                event_id=interaction.id,
+                event_id=follow_up_event_id,
             )
             logger.warning(
                 "[INTERACTION] 未知 button_data | interaction_id=%s | button_data=%r",

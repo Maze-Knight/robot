@@ -72,6 +72,12 @@ class RemoteClientTests(unittest.IsolatedAsyncioTestCase):
         )
         self.assertTrue((await client.create_login_ticket(identity())).url.startswith("https://gift.example.com/"))
 
+    async def test_login_ticket_accepts_deployed_ok_root_contract(self) -> None:
+        client = await self._client(
+            lambda request: httpx.Response(200, json={"ok": True, "url": "https://gift.example.com/tr-board/entry?t=private"})
+        )
+        self.assertTrue((await client.create_login_ticket(identity())).url.startswith("https://gift.example.com/"))
+
     async def test_login_ticket_rejects_untrusted_url(self) -> None:
         client = await self._client(
             lambda request: httpx.Response(200, json={"url": "https://evil.example/tr-board/entry?t=private"})
@@ -107,6 +113,12 @@ class RemoteClientTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(calls, 2)
         self.assertTrue(summary.profile_exists)
         self.assertEqual(summary.owned_characters, 46)
+
+    async def test_summary_accepts_deployed_ok_root_contract(self) -> None:
+        client = await self._client(
+            lambda request: httpx.Response(200, json={"ok": True, "profile_exists": False})
+        )
+        self.assertFalse((await client.get_summary(identity())).profile_exists)
 
     async def test_api_errors_are_typed(self) -> None:
         cases = [

@@ -171,7 +171,10 @@ class TrickcalClient:
         if response.is_error:
             raise TrickcalUnavailableError(f"website API returned HTTP {response.status_code}")
 
-        payload = raw.get("data") if raw.get("ok") is True else raw
+        # The deployed website accepts both successful shapes during its
+        # transition: {ok:true,data:{...}} and {ok:true,...}.  Keep parsing at
+        # this boundary so callers never need to inspect response dictionaries.
+        payload = raw.get("data", raw) if raw.get("ok") is True else raw
         if not isinstance(payload, dict):
             raise TrickcalInvalidResponseError("website API data is not an object")
         return payload
