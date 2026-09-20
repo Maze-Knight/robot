@@ -117,7 +117,9 @@ def git_pull_fast_forward(repository: Path) -> tuple[bool, str]:
     code, status = run_git(repository, ["status", "--porcelain"])
     if code != 0:
         return False, status
-    if status.strip():
+    # run_git supplies a user-facing placeholder for genuinely empty output.
+    # `git status --porcelain` is intentionally empty in a clean worktree.
+    if status != "（没有输出）":
         return False, "工作区存在未提交修改。为避免覆盖，请先提交或处理这些修改。"
     code, output = run_git(repository, ["pull", "--ff-only"], timeout=180)
     return code == 0, output

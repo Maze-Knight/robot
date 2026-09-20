@@ -115,3 +115,15 @@ class ManagerCoreTests(unittest.TestCase):
             command = run.call_args.args[0]
             self.assertIn("-SkipInstall", command)
             self.assertEqual(command[-2:], ["-ManagerName", "ElenaManager.next"])
+
+    def test_safe_pull_accepts_a_clean_porcelain_status(self) -> None:
+        from manager_core import git_pull_fast_forward
+
+        with patch(
+            "manager_core.run_git",
+            side_effect=[(0, "（没有输出）"), (0, "Already up to date.")],
+        ):
+            ok, output = git_pull_fast_forward(Path("repository"))
+
+        self.assertTrue(ok)
+        self.assertEqual(output, "Already up to date.")
