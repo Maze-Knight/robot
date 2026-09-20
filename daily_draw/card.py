@@ -196,7 +196,22 @@ class DailyDrawCardRenderer:
                 raise ValueError("invalid portrait path")
             with Image.open(path) as image:
                 portrait = image.convert("RGBA")
-                portrait.thumbnail((size, size), Image.Resampling.LANCZOS)
+                # The synchronized portraits are compact source sprites (usually
+                # 126 px). ``thumbnail`` never enlarges images, which left a
+                # tiny character in the middle of the single-pull card. Crop
+                # transparent sprite padding first, then scale in either
+                # direction while keeping a small, deliberate card margin.
+                alpha_box = portrait.getchannel("A").getbbox()
+                if alpha_box is not None:
+                    portrait = portrait.crop(alpha_box)
+                margin = max(6, round(size * 0.12))
+                target = max(1, size - margin * 2)
+                scale = min(target / portrait.width, target / portrait.height)
+                scaled_size = (
+                    max(1, round(portrait.width * scale)),
+                    max(1, round(portrait.height * scale)),
+                )
+                portrait = portrait.resize(scaled_size, Image.Resampling.LANCZOS)
                 background = Image.new("RGB", (size, size), "#e9eef3")
                 position = ((size - portrait.width) // 2, (size - portrait.height) // 2)
                 background.paste(

@@ -64,6 +64,33 @@ class DrawEngineTests(unittest.TestCase):
                 self.assertEqual(image.size, (720, 820))
                 self.assertEqual(image.format, "PNG")
 
+    def test_single_pull_portrait_scales_up_to_the_card_frame(self) -> None:
+        from daily_draw.models import DrawItem, DrawRecord
+
+        with tempfile.TemporaryDirectory() as folder:
+            root = Path(folder)
+            Image.new("RGB", (126, 126), "#ff99aa").save(root / "portrait.png")
+            renderer = DailyDrawCardRenderer(root)
+            portrait = renderer._load_portrait("portrait.png", size=470)
+            item = DrawItem("test", "测试使徒", "portrait.png")
+            record = DrawRecord(
+                DrawIdentity("qq_official", "member"),
+                "2026-09-15",
+                (item,),
+                "2026-09-15T12:00:00+08:00",
+            )
+            first = renderer.render(record, already_drawn=False)
+            replay = renderer.render(record, already_drawn=True)
+
+        # A 126 px source portrait is enlarged to nearly fill its 470 px frame,
+        # but retains an intentional edge margin rather than being cropped.
+        self.assertEqual(portrait.getpixel((56, 235)), (255, 153, 170))
+        self.assertEqual(portrait.getpixel((40, 235)), (233, 238, 243))
+        with Image.open(__import__("io").BytesIO(first)) as first_image:
+            self.assertIn((242, 138, 61), first_image.get_flattened_data())
+        with Image.open(__import__("io").BytesIO(replay)) as replay_image:
+            self.assertIn((128, 104, 216), replay_image.get_flattened_data())
+
     def test_renderer_builds_complete_collection_grid(self) -> None:
         from daily_draw.models import DrawItem
 
@@ -276,6 +303,13 @@ class DailyDrawControllerTests(unittest.IsolatedAsyncioTestCase):
             await controller.handle_text(context)
 
         render.assert_called_once_with(already_drawn=True)
+        menus.send_image.assert_awaited_once_with(
+            "group",
+            "group",
+            b"replayed-card",
+            reply_to="message-2",
+            keyboard=build_daily_draw_keyboard(),
+        )
 
 
 if __name__ == "__main__":
