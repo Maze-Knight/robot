@@ -22,6 +22,12 @@ cd C:\Bots\ElenaBot
 - 完整仓库中可点击“一键更新”：它会拒绝未提交修改，安全拉取远程代码、重建机器人 EXE，并自动替换和重启管理器及机器人。完成后仍须在 `logs\bot.log` 中确认 `ONLINE`。
 - 管理器不会读取或写入任何 Access Token，也不会将 `.env` 的值写进终端日志。
 
+### 管理器的 Git 前提
+
+Git 状态、拉取和推送需要这台机器安装 Git for Windows。管理器会自动查找系统 `PATH`、`C:\Program Files\Git` 等常见位置；若 Git 安装在其他位置，可在启动管理器前设置当前用户环境变量 `GIT_EXE_PATH` 为 `git.exe` 的完整路径，然后重新启动管理器。
+
+如果显示“未找到 git.exe”，这是本机缺少 Git 工具，不是机器人、`.env` 或 QQ Gateway 故障。仅复制 `dist` 目录且没有完整仓库时，Git 功能仍会安全拒绝。
+
 `daily_draw_pool.json` 必须和 `ElenaBot.exe` 放在同一目录。Crayon Note 使徒头像已经打包进 EXE；奖池 JSON 负责名称和图片映射。新奖池首次加载时会自动清空旧每日抽取记录与旧图鉴进度。
 
 程序带有单实例锁。重复启动时，新进程会显示“机器人已经在运行”并退出，不会让同一条 QQ 消息被回复两次。
