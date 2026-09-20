@@ -37,6 +37,12 @@ PANEL_ITEMS: tuple[dict[str, Any], ...] = (
     },
     {
         "type": "command",
+        "name": "每日单抽",
+        "desc": "抽取今日使徒",
+        "only_admin": False,
+    },
+    {
+        "type": "command",
         "name": "帮助",
         "desc": "查看终端使用说明",
         "only_admin": False,
