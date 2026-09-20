@@ -125,9 +125,22 @@ def resolve_git_executable() -> str | None:
             local_app_data = str(Path(profile) / "AppData" / "Local")
     candidates.extend(
         str(Path(root) / relative)
-        for root in (program_files, program_files_x86, local_app_data)
+        for root in (program_files, program_files_x86)
         for relative in (Path("Git") / "cmd" / "git.exe", Path("Git") / "bin" / "git.exe")
     )
+    if local_app_data:
+        # Git for Windows' per-user installer normally uses
+        # %LOCALAPPDATA%\Programs\Git, while some portable installs use
+        # %LOCALAPPDATA%\Git.
+        candidates.extend(
+            str(Path(local_app_data) / relative)
+            for relative in (
+                Path("Programs") / "Git" / "cmd" / "git.exe",
+                Path("Programs") / "Git" / "bin" / "git.exe",
+                Path("Git") / "cmd" / "git.exe",
+                Path("Git") / "bin" / "git.exe",
+            )
+        )
     for candidate in candidates:
         try:
             if Path(candidate).is_file():

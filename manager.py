@@ -92,7 +92,9 @@ def _start_replacement_helper(*, staged: Path, target: Path, runtime: Path) -> N
     )
 
 
-def _apply_manager_update(*, staged: Path, target: Path, runtime: Path) -> None:
+def _apply_manager_update(
+    *, staged: Path, target: Path, runtime: Path, launch_bot_after_update: bool = True
+) -> None:
     """Replace the old Manager binary after its server process releases the file."""
     deadline = time.monotonic() + 45
     while time.monotonic() < deadline:
@@ -106,8 +108,11 @@ def _apply_manager_update(*, staged: Path, target: Path, runtime: Path) -> None:
     else:
         return
     flags = getattr(subprocess, "CREATE_NO_WINDOW", 0)
+    command = [str(target)]
+    if launch_bot_after_update:
+        command.append("--launch-bot")
     subprocess.Popen(
-        [str(target), "--launch-bot"],
+        command,
         cwd=runtime,
         stdout=subprocess.DEVNULL,
         stderr=subprocess.DEVNULL,
@@ -265,6 +270,7 @@ def main() -> None:
     parser.add_argument("--target")
     parser.add_argument("--runtime")
     parser.add_argument("--launch-bot", action="store_true")
+    parser.add_argument("--no-launch-bot-after-update", action="store_true")
     arguments, _unknown = parser.parse_known_args()
     if arguments.apply_manager_update:
         if not all((arguments.staged, arguments.target, arguments.runtime)):
@@ -273,6 +279,7 @@ def main() -> None:
             staged=Path(arguments.staged),
             target=Path(arguments.target),
             runtime=Path(arguments.runtime),
+            launch_bot_after_update=not arguments.no_launch_bot_after_update,
         )
         return
     if sys.stdout is None:
