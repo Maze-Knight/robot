@@ -142,7 +142,11 @@ def run_git(repository: Path, arguments: Iterable[str], *, timeout: int = 90) ->
         helper_path = Path(probe.stdout.strip())
         if helper_path.is_dir():
             environment["GIT_EXEC_PATH"] = str(helper_path)
-    command = [git, "-C", str(repository), *arguments]
+    # The bundled Git defaults to Schannel, which can fail for a windowed
+    # PyInstaller child with SEC_E_NO_CREDENTIALS.  Its OpenSSL backend is
+    # available on the supported Windows runtime and uses the normal HTTPS
+    # trust store without depending on an interactive credential handle.
+    command = [git, "-c", "http.sslBackend=openssl", "-C", str(repository), *arguments]
     try:
         completed = subprocess.run(
             command,

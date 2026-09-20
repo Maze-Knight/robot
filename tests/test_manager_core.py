@@ -144,6 +144,7 @@ class ManagerCoreTests(unittest.TestCase):
 
             self.assertEqual((code, output), (0, "ok"))
             self.assertEqual(run.call_args_list[1].kwargs["env"]["GIT_EXEC_PATH"], str(helper_path))
+            self.assertEqual(run.call_args_list[1].args[0][1:3], ["-c", "http.sslBackend=openssl"])
 
     def test_git_runner_prioritizes_its_own_runtime_and_user_home(self) -> None:
         from manager_core import run_git
