@@ -10,6 +10,7 @@ from fastapi.testclient import TestClient
 
 from majsoul_data_service.app import create_app
 from majsoul_data_service.database import MajsoulDataRepository
+from majsoul_data_service.importer import import_local_file
 
 
 class MajsoulDataServiceTests(unittest.TestCase):
@@ -114,6 +115,48 @@ class MajsoulDataServiceTests(unittest.TestCase):
             self.assertEqual(response.status_code, 200)
             self.assertEqual(response.json()["mode"], "four")
             self.assertEqual(response.json()["total_games"], 42)
+
+    def test_local_import_is_idempotent_and_serves_search_profile_records(self) -> None:
+        import asyncio
+        import json
+
+        payload = {
+            "source": "test_fixture_local_file",
+            "players": [{
+                "amae_player_id": "local-test-player",
+                "nickname": "本地测试玩家",
+                "profiles": [{
+                    "mode": "four", "level_id": 10401, "level_score": 900,
+                    "total_games": 12, "average_rank": 2.25, "negative_rate": 0.1,
+                    "rank_rates": [0.3, 0.3, 0.2, 0.2],
+                    "extended_stats": {"和牌率": 0.2}, "source_record_id": "profile-test",
+                }],
+                "game_records": [{
+                    "mode": "four", "mode_id": 12, "source_record_id": "game-test-1",
+                    "started_at": "2026-09-20T00:00:00+00:00", "placement": 1,
+                    "score": 42000, "players": [{"accountId": "local-test-player", "score": 42000}],
+                }],
+            }],
+        }
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            source = root / "authorized-local-export.json"
+            source.write_text(json.dumps(payload, ensure_ascii=False), encoding="utf-8")
+            database = root / "service.sqlite3"
+            repository = MajsoulDataRepository(database)
+            asyncio.run(repository.initialize())
+            first = asyncio.run(import_local_file(repository, source))
+            second = asyncio.run(import_local_file(repository, source))
+            with TestClient(create_app(database)) as client:
+                search = client.get("/v1/players/search?nickname=本地测试")
+                profile = client.get("/v1/players/local-test-player/profile?mode=four")
+                records = client.get("/v1/players/local-test-player/records?mode=four")
+        self.assertEqual((first.players, first.profiles, first.records), (1, 1, 1))
+        self.assertEqual((second.players, second.profiles, second.records), (1, 1, 1))
+        self.assertEqual(search.status_code, 200)
+        self.assertEqual(search.json()[0]["amae_player_id"], "local-test-player")
+        self.assertEqual(profile.json()["extended_stats"]["和牌率"], 0.2)
+        self.assertEqual(records.json()[0]["source_record_id"], "game-test-1")
 
 
 if __name__ == "__main__":

@@ -260,6 +260,7 @@ async def run_bot(settings: Settings) -> None:
     from trickcal.client import TrickcalClient
     from trickcal.remote_service import TrickcalRemoteService
     from majsoul.client import MajsoulClient
+    from majsoul.self_hosted_client import SelfHostedMajsoulClient
     from majsoul.commands import MajsoulController
     from majsoul.renderer import MajsoulCardRenderer
     from majsoul.repository import MajsoulRepository
@@ -319,8 +320,23 @@ async def run_bot(settings: Settings) -> None:
         )
         majsoul_repository = MajsoulRepository(APP_DIR / "data" / "majsoul.sqlite3")
         await majsoul_repository.initialize()
+        majsoul_client: Any = MajsoulClient(http_client)
+        if settings.majsoul_data_mode == "self_hosted":
+            local_majsoul_client = SelfHostedMajsoulClient(
+                http_client, base_url=settings.majsoul_data_api_base_url
+            )
+            if await local_majsoul_client.health():
+                logger.info("[MAJSOUL] self-hosted data service is healthy")
+            else:
+                logger.warning(
+                    "[MAJSOUL] self-hosted data service is unavailable; public fallback is disabled"
+                )
+            # Never silently redirect a self-hosted deployment back to a public
+            # third-party API.  The local client gives users a controlled error
+            # until the service is healthy and contains authorized data.
+            majsoul_client = local_majsoul_client
         majsoul_controller = MajsoulController(
-            MajsoulService(MajsoulClient(http_client), majsoul_repository),
+            MajsoulService(majsoul_client, majsoul_repository),
             menus,
             MajsoulCardRenderer(),
         )

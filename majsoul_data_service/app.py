@@ -8,8 +8,8 @@ from pathlib import Path
 from fastapi import FastAPI, HTTPException, Query
 from pydantic import BaseModel
 
-from .database import MajsoulDataRepository, StoredPlayer, StoredProfile
-from .providers import EmptyProvider, MajsoulDataProvider
+from .database import MajsoulDataRepository, StoredPlayer, StoredProfile, StoredRecord
+from .providers import EmptyProvider, LocalFileProvider, MajsoulDataProvider
 
 _PLAYER_ID = re.compile(r"^[A-Za-z0-9_-]{1,80}$")
 DEFAULT_DATABASE_PATH = Path(
@@ -36,6 +36,26 @@ class ProfileResponse(BaseModel):
     source: str
     source_record_id: str | None
     synced_at: str
+    rank_rates: list[float] = []
+    extended_stats: dict[str, float | int] = {}
+
+
+class SearchResponse(BaseModel):
+    amae_player_id: str
+    nickname: str
+    level_id: int
+    mode: str
+    latest_timestamp: int
+
+
+class RecordResponse(BaseModel):
+    source_record_id: str
+    mode: str
+    mode_id: int | None
+    started_at: str | None
+    placement: int | None
+    score: int | None
+    players: list[dict[str, object]]
 
 
 def _validate_player_id(amae_player_id: str) -> str:
@@ -77,6 +97,8 @@ def _profile_response(profile: StoredProfile) -> ProfileResponse:
         source=profile.source,
         source_record_id=profile.source_record_id,
         synced_at=profile.synced_at,
+        rank_rates=list(profile.rank_rates),
+        extended_stats=profile.extended_stats or {},
     )
 
 
@@ -106,6 +128,19 @@ def create_app(
             "provider": active_provider.name,
         }
 
+    @app.get("/v1/players/search", response_model=list[SearchResponse])
+    async def search_players(nickname: str = Query(..., min_length=1, max_length=64)) -> list[SearchResponse]:
+        return [
+            SearchResponse(
+                amae_player_id=item.amae_player_id,
+                nickname=item.nickname,
+                level_id=item.level_id,
+                mode=item.mode,
+                latest_timestamp=item.latest_timestamp,
+            )
+            for item in await repository.search_players(nickname)
+        ]
+
     @app.get("/v1/players/{amae_player_id}", response_model=PlayerResponse)
     async def player(amae_player_id: str) -> PlayerResponse:
         player_id = _validate_player_id(amae_player_id)
@@ -124,6 +159,28 @@ def create_app(
         if stored is None:
             raise _not_synced(player_id, mode)
         return _profile_response(stored)
+
+    @app.get("/v1/players/{amae_player_id}/records", response_model=list[RecordResponse])
+    async def records(
+        amae_player_id: str,
+        mode: str = Query(..., pattern="^(four|three)$"),
+        limit: int = Query(20, ge=1, le=50),
+    ) -> list[RecordResponse]:
+        player_id = _validate_player_id(amae_player_id)
+        if await repository.get_profile(player_id, mode) is None:
+            raise _not_synced(player_id, mode)
+        return [
+            RecordResponse(
+                source_record_id=item.source_record_id,
+                mode=item.mode,
+                mode_id=item.mode_id,
+                started_at=item.started_at,
+                placement=item.placement,
+                score=item.score,
+                players=[dict(player) for player in item.players],
+            )
+            for item in await repository.get_records(player_id, mode, limit)
+        ]
 
     return app
 
