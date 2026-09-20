@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import tempfile
 import unittest
+import os
 from pathlib import Path
 from types import SimpleNamespace
 from unittest.mock import patch
@@ -165,3 +166,25 @@ class ManagerCoreTests(unittest.TestCase):
         environment = run.call_args_list[1].kwargs["env"]
         self.assertTrue(environment["PATH"].startswith("C:\\Tools\\Git\\mingw64\\bin"))
         self.assertEqual(environment["HOME"], "C:\\Users\\Mayor")
+
+    def test_git_runner_reports_missing_executable_without_winerror(self) -> None:
+        from manager_core import run_git
+
+        with (
+            patch("manager_core.shutil.which", return_value=None),
+            patch("manager_core.Path.is_file", return_value=False),
+            patch.dict(
+                os.environ,
+                {
+                    "LOCALAPPDATA": "C:\\NoSuchAppData",
+                    "ProgramFiles": "C:\\NoSuchProgramFiles",
+                    "ProgramFiles(x86)": "C:\\NoSuchProgramFilesX86",
+                },
+                clear=True,
+            ),
+        ):
+            code, output = run_git(Path("repository"), ["status"])
+
+        self.assertEqual(code, 1)
+        self.assertIn("未找到 git.exe", output)
+        self.assertNotIn("WinError 2", output)

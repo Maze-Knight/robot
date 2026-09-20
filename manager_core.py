@@ -104,8 +104,43 @@ def launch_bot(runtime_directory: Path) -> subprocess.Popen[bytes]:
     return subprocess.Popen(command, cwd=cwd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, creationflags=flags)
 
 
+def resolve_git_executable() -> str | None:
+    """Find Git even when a windowed/PyInstaller process has a reduced PATH."""
+    configured = os.environ.get("GIT_EXE_PATH", "").strip()
+    candidates: list[str] = []
+    if configured:
+        candidates.append(configured)
+    discovered = shutil.which("git")
+    if discovered:
+        # shutil.which only returns a path after resolving an executable.
+        # Trust it even when tests or a launcher provide a relative path.
+        return str(Path(discovered).resolve())
+
+    program_files = os.environ.get("ProgramFiles", r"C:\Program Files")
+    program_files_x86 = os.environ.get("ProgramFiles(x86)", r"C:\Program Files (x86)")
+    local_app_data = os.environ.get("LOCALAPPDATA", "").strip()
+    if not local_app_data:
+        profile = os.environ.get("USERPROFILE", "").strip()
+        if profile:
+            local_app_data = str(Path(profile) / "AppData" / "Local")
+    candidates.extend(
+        str(Path(root) / relative)
+        for root in (program_files, program_files_x86, local_app_data)
+        for relative in (Path("Git") / "cmd" / "git.exe", Path("Git") / "bin" / "git.exe")
+    )
+    for candidate in candidates:
+        try:
+            if Path(candidate).is_file():
+                return str(Path(candidate).resolve())
+        except OSError:
+            continue
+    return None
+
+
 def run_git(repository: Path, arguments: Iterable[str], *, timeout: int = 90) -> tuple[int, str]:
-    git = shutil.which("git") or "git"
+    git = resolve_git_executable()
+    if git is None:
+        return 1, "未找到 git.exe。请安装 Git for Windows，或设置 GIT_EXE_PATH 为 git.exe 的完整路径。"
     environment = os.environ.copy()
     git_path = Path(git)
     if git_path.is_file():
