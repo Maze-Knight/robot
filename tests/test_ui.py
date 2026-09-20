@@ -15,6 +15,7 @@ from ui.keyboards import (
     build_gift_periods_keyboard,
     build_help_keyboard,
     build_main_keyboard,
+    build_majsoul_keyboard,
     build_notices_keyboard,
     build_services_keyboard,
 )
@@ -79,6 +80,7 @@ class KeyboardTests(unittest.TestCase):
             build_help_keyboard(),
             build_gift_keyboard(),
             build_gift_periods_keyboard(["第十二期"]),
+            build_majsoul_keyboard(),
         )
         for keyboard in keyboards:
             rows = keyboard.to_dict()["content"]["rows"]
@@ -98,6 +100,7 @@ class KeyboardTests(unittest.TestCase):
                 "/每日单抽",
                 "/图鉴",
                 "/蜡笔板",
+                "/雀魂服务",
                 "/返回终端",
             ],
         )
@@ -135,6 +138,10 @@ class KeyboardTests(unittest.TestCase):
         )
 
     def test_non_service_menus_use_stable_data(self) -> None:
+        self.assertEqual(
+            self._button_data(build_majsoul_keyboard()),
+            ["/雀魂", "/登记雀魂", "/市政服务"],
+        )
         self.assertEqual(
             self._button_data(build_experiments_keyboard()),
             ["/随机实验", "/对话测试", "/返回终端"],

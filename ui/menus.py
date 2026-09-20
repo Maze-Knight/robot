@@ -15,6 +15,8 @@ from .keyboards import (
     build_gift_keyboard,
     build_gift_periods_keyboard,
     build_main_keyboard,
+    build_majsoul_candidates_keyboard,
+    build_majsoul_keyboard,
     build_notices_keyboard,
     build_services_keyboard,
     build_trickcal_keyboard,
@@ -174,6 +176,32 @@ class MenuService:
             build_trickcal_keyboard(),
             reply_to=reply_to,
             event_id=event_id,
+        )
+
+    async def send_majsoul_home(
+        self,
+        scene: str,
+        chat_id: str,
+        content: str,
+        *,
+        reply_to: str | None = None,
+        event_id: str | None = None,
+    ) -> dict[str, Any]:
+        return await self._send_markdown_keyboard(
+            scene, chat_id, content, build_majsoul_keyboard(), reply_to=reply_to, event_id=event_id
+        )
+
+    async def send_majsoul_candidates(
+        self,
+        scene: str,
+        chat_id: str,
+        content: str,
+        candidates: list[Any],
+        *,
+        reply_to: str | None = None,
+    ) -> dict[str, Any]:
+        return await self._send_markdown_keyboard(
+            scene, chat_id, content, build_majsoul_candidates_keyboard(candidates), reply_to=reply_to
         )
 
     async def send_trickcal_login(

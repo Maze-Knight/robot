@@ -133,12 +133,34 @@ def build_services_keyboard() -> InlineKeyboard:
             ],
             [
                 _command_button("service_trickcal", "🖍️ 蜡笔板", "/蜡笔板"),
+                _command_button("service_majsoul", "🀄 雀魂档案", "/雀魂服务"),
             ],
             [
                 _command_button("service_home", "🔙 返回终端", "/返回终端", style=0),
             ],
         ]
     )
+
+
+def build_majsoul_keyboard() -> InlineKeyboard:
+    return _keyboard(
+        [
+            [_command_button("majsoul_profile", "👤 我的档案", "/雀魂")],
+            [_command_button("majsoul_register", "🔗 身份登记", "/登记雀魂")],
+            [_command_button("majsoul_back", "🔙 返回市政服务", "/市政服务", style=0)],
+        ]
+    )
+
+
+def build_majsoul_candidates_keyboard(candidates: list[object]) -> InlineKeyboard:
+    buttons: list[KeyboardButton] = []
+    for index, candidate in enumerate(candidates[:5], start=1):
+        player_id = str(getattr(candidate, "player_id", ""))
+        nickname = str(getattr(candidate, "nickname", "候选玩家"))[:18]
+        buttons.append(_button(f"majsoul_bind_{index}", f"🀄 {nickname}", f"majsoul:bind:{player_id}", style=1))
+    rows = [[button] for button in buttons]
+    rows.append([_command_button("majsoul_candidate_back", "🔙 返回档案", "/雀魂", style=0)])
+    return _keyboard(rows)
 
 
 def build_trickcal_keyboard() -> InlineKeyboard:

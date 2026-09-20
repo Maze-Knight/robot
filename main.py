@@ -47,6 +47,7 @@ class MessageContext:
     draw_handler: PluginHandler | None = field(default=None, repr=False)
     menu_handler: PluginHandler | None = field(default=None, repr=False)
     trickcal_handler: PluginHandler | None = field(default=None, repr=False)
+    majsoul_handler: PluginHandler | None = field(default=None, repr=False)
 
 
 class SecretRedactionFilter(logging.Filter):
@@ -162,6 +163,7 @@ async def handle_message(context: MessageContext) -> None:
         ("礼包查询", context.gift_handler),
         ("每日单抽", context.draw_handler),
         ("蜡笔板", context.trickcal_handler),
+        ("雀魂档案", context.majsoul_handler),
         ("菜单指令", context.menu_handler),
     ):
         if handler is None:
@@ -197,6 +199,7 @@ def make_message_context(
     draw_handler: PluginHandler | None = None,
     menu_handler: PluginHandler | None = None,
     trickcal_handler: PluginHandler | None = None,
+    majsoul_handler: PluginHandler | None = None,
 ) -> MessageContext:
     """Convert an SDK InboundEvent into the stable application context."""
 
@@ -225,6 +228,7 @@ def make_message_context(
         draw_handler=draw_handler,
         menu_handler=menu_handler,
         trickcal_handler=trickcal_handler,
+        majsoul_handler=majsoul_handler,
     )
 
 
@@ -255,6 +259,11 @@ async def run_bot(settings: Settings) -> None:
     from trickcal.commands import TrickcalController
     from trickcal.client import TrickcalClient
     from trickcal.remote_service import TrickcalRemoteService
+    from majsoul.client import MajsoulClient
+    from majsoul.commands import MajsoulController
+    from majsoul.renderer import MajsoulCardRenderer
+    from majsoul.repository import MajsoulRepository
+    from majsoul.service import MajsoulService
 
     # SDK 1.2.2 has no public per-client intents argument and otherwise requests
     # unrelated guild/interaction privileges. Keep this pinned-version project
@@ -307,6 +316,13 @@ async def run_bot(settings: Settings) -> None:
             draw_service,
             menus,
             DailyDrawCardRenderer(RESOURCE_DIR / "daily_draw_assets"),
+        )
+        majsoul_repository = MajsoulRepository(APP_DIR / "data" / "majsoul.sqlite3")
+        await majsoul_repository.initialize()
+        majsoul_controller = MajsoulController(
+            MajsoulService(MajsoulClient(http_client), majsoul_repository),
+            menus,
+            MajsoulCardRenderer(),
         )
         trickcal_refresh_task: asyncio.Task[None] | None = None
         trickcal_web_server: Any | None = None
@@ -406,6 +422,7 @@ async def run_bot(settings: Settings) -> None:
                     draw_handler=draw_controller.handle_text,
                     menu_handler=menus.handle_text,
                     trickcal_handler=trickcal_controller.handle_text,
+                    majsoul_handler=majsoul_controller.handle_text,
                 )
                 logger.info(
                     "收到消息 | received_at=%s | event_type=%s | message_type=%s "
@@ -429,7 +446,7 @@ async def run_bot(settings: Settings) -> None:
         ) -> None:
             try:
                 await handle_interaction(
-                    event_type, raw, api, menus, trickcal_controller
+                    event_type, raw, api, menus, trickcal_controller, majsoul_controller
                 )
             except Exception:
                 logger.exception("交互事件处理异常 | event_type=%s", event_type)
