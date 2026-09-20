@@ -82,6 +82,7 @@ class MajsoulClientTests(unittest.IsolatedAsyncioTestCase):
             second = await client.search_players("Maze")
         self.assertEqual(first, second)
         self.assertEqual(calls, 2)
+        self.assertEqual(first[0].mode_family, "four")
 
     async def test_stats_and_recent_games_are_parsed(self) -> None:
         def handler(request: httpx.Request) -> httpx.Response:

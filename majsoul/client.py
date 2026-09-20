@@ -87,7 +87,12 @@ class MajsoulClient:
                 if any(isinstance(error, MajsoulRateLimitError) for error in errors):
                     raise MajsoulRateLimitError("player search rate limited")
                 raise errors[0]
-            unique = {candidate.player_id: candidate for candidate in results}
+            # Search both endpoints, but a player can appear in both.  Preserve
+            # the first (four-player) candidate so an unqualified profile uses
+            # the documented first-version default of four-player mahjong.
+            unique: dict[str, PlayerCandidate] = {}
+            for candidate in results:
+                unique.setdefault(candidate.player_id, candidate)
             return tuple(sorted(unique.values(), key=lambda item: item.latest_timestamp, reverse=True))
 
         return await self._cached(key, 3600.0, load)
