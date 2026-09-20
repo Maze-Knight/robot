@@ -130,7 +130,7 @@ class KeyboardTests(unittest.TestCase):
     def test_daily_draw_buttons_emit_chinese_commands(self) -> None:
         self.assertEqual(
             self._button_data(build_daily_draw_keyboard()),
-            ["/每日单抽", "/抽取记录", "/市政服务"],
+            ["/每日单抽", "/图鉴", "/市政服务"],
         )
         self.assertEqual(
             self._button_data(build_collection_keyboard()),

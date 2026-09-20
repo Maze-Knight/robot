@@ -10,7 +10,7 @@ from .models import CollectionSnapshot, DrawRecord
 
 class DailyDrawCardRenderer:
     WIDTH = 720
-    HEIGHT = 720
+    HEIGHT = 820
 
     def __init__(self, asset_dir: Path) -> None:
         self.asset_dir = asset_dir
@@ -26,7 +26,7 @@ class DailyDrawCardRenderer:
                 return ImageFont.truetype(str(path), size)
         return ImageFont.load_default()
 
-    def render(self, record: DrawRecord) -> bytes:
+    def render(self, record: DrawRecord, *, already_drawn: bool = False) -> bytes:
         if not record.items:
             raise ValueError("daily draw record has no item")
         item = record.items[0]
@@ -35,6 +35,7 @@ class DailyDrawCardRenderer:
         title_font = self._font(42, bold=True)
         name_font = self._font(48, bold=True)
         small_font = self._font(20)
+        status_font = self._font(24, bold=True)
         draw.rounded_rectangle(
             (28, 28, self.WIDTH - 28, self.HEIGHT - 28),
             radius=28,
@@ -44,20 +45,38 @@ class DailyDrawCardRenderer:
         )
         draw.text((62, 58), "莫纳提姆 · 每日单抽", font=title_font, fill="#263a66")
         draw.text((62, 116), record.draw_date, font=small_font, fill="#8d7c6b")
+        status = "今日已抽取" if already_drawn else "今日首次抽取"
+        status_box = draw.textbbox((0, 0), status, font=status_font)
+        status_width = status_box[2] - status_box[0] + 28
         draw.rounded_rectangle(
-            (110, 164, 610, 564),
+            (self.WIDTH - 62 - status_width, 62, self.WIDTH - 62, 102),
+            radius=18,
+            fill="#8068d8" if already_drawn else "#f28a3d",
+        )
+        draw.text(
+            (self.WIDTH - 48 - status_width, 69),
+            status,
+            font=status_font,
+            fill="#ffffff",
+        )
+        draw.rounded_rectangle(
+            (78, 164, 642, 650),
             radius=28,
             fill="#f3e8fb",
             outline="#8068d8",
             width=5,
         )
-        portrait = self._load_portrait(item.image, size=360)
-        canvas.paste(portrait, (180, 184))
-        self._draw_centered_name(draw, item.name, 62, 586, self.WIDTH - 124, name_font, fill="#263a66")
-        footer = "抽取完成。结果当然已经算好了。"
+        portrait = self._load_portrait(item.image, size=470)
+        canvas.paste(portrait, (125, 175))
+        self._draw_centered_name(draw, item.name, 62, 670, self.WIDTH - 124, name_font, fill="#263a66")
+        footer = (
+            "今天已经抽过了，展示本次记录。"
+            if already_drawn
+            else "今日第一次抽取完成。结果当然已经算好了。"
+        )
         footer_box = draw.textbbox((0, 0), footer, font=small_font)
         draw.text(
-            ((self.WIDTH - (footer_box[2] - footer_box[0])) / 2, 654),
+            ((self.WIDTH - (footer_box[2] - footer_box[0])) / 2, 740),
             footer,
             font=small_font,
             fill="#8d7c6b",

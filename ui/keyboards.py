@@ -196,7 +196,7 @@ def build_daily_draw_keyboard() -> InlineKeyboard:
         [
             [
                 _command_button("draw_one", "🎲 每日单抽", "/每日单抽"),
-                _command_button("draw_record", "📜 今日记录", "/抽取记录"),
+                _command_button("draw_collection", "📖 图鉴", "/图鉴"),
             ],
             [
                 _command_button("draw_back", "🔙 市政服务", "/市政服务", style=0),

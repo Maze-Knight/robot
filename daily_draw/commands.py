@@ -6,6 +6,7 @@ from typing import Any
 from . import copywriting as copy
 from .models import DrawIdentity
 from .service import DailyDrawService
+from ui.keyboards import build_daily_draw_keyboard
 
 
 logger = logging.getLogger("elena.qq.daily_draw")
@@ -42,6 +43,7 @@ class DailyDrawController:
         chat_id = context.group_id or context.user_id
         outcome_record = None
         snapshot = None
+        result_already_drawn = False
         if action == "home":
             content = copy.HOME if self._service.catalog.ready else copy.POOL_NOT_READY
         elif action == "collection":
@@ -51,6 +53,7 @@ class DailyDrawController:
             record = await self._service.get_today(identity)
             content = copy.record_text(record, already_drawn=True) if record else copy.NO_RECORD
             outcome_record = record
+            result_already_drawn = record is not None
         else:
             outcome = await self._service.draw(identity)
             if outcome.state == "pool_not_ready":
@@ -63,15 +66,20 @@ class DailyDrawController:
                     updates=outcome.updates,
                 )
                 outcome_record = outcome.record
+                result_already_drawn = outcome.state == "already_drawn"
         if outcome_record is not None:
             if self._renderer is not None:
                 try:
-                    image = self._renderer.render(outcome_record)
+                    image = self._renderer.render(
+                        outcome_record,
+                        already_drawn=result_already_drawn,
+                    )
                     await self._menus.send_image(
                         context.scene_type,
                         chat_id,
                         image,
                         reply_to=context.message_id,
+                        keyboard=build_daily_draw_keyboard(),
                     )
                     return True
                 except Exception:

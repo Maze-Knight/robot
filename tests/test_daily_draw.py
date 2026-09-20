@@ -5,7 +5,7 @@ import tempfile
 import unittest
 from pathlib import Path
 from types import SimpleNamespace
-from unittest.mock import AsyncMock
+from unittest.mock import AsyncMock, Mock
 
 from daily_draw.catalog import DrawCatalog
 from daily_draw.card import DailyDrawCardRenderer
@@ -15,6 +15,7 @@ from daily_draw.models import CollectionEntry, CollectionSnapshot, DrawIdentity
 from daily_draw.repository import DrawRepository
 from daily_draw.service import DailyDrawService
 from PIL import Image
+from ui.keyboards import build_daily_draw_keyboard
 
 
 class FakeRandom:
@@ -60,7 +61,7 @@ class DrawEngineTests(unittest.TestCase):
             )
             rendered = DailyDrawCardRenderer(root).render(record)
             with Image.open(__import__("io").BytesIO(rendered)) as image:
-                self.assertEqual(image.size, (720, 720))
+                self.assertEqual(image.size, (720, 820))
                 self.assertEqual(image.format, "PNG")
 
     def test_renderer_builds_complete_collection_grid(self) -> None:
@@ -217,7 +218,9 @@ class DailyDrawControllerTests(unittest.IsolatedAsyncioTestCase):
             controller = DailyDrawController(
                 service,
                 menus,
-                renderer=SimpleNamespace(render=lambda record: b"single-card"),
+                renderer=SimpleNamespace(
+                    render=lambda record, *, already_drawn=False: b"single-card"
+                ),
             )
             context = SimpleNamespace(
                 content="/每日单抽",
@@ -232,9 +235,47 @@ class DailyDrawControllerTests(unittest.IsolatedAsyncioTestCase):
 
         self.assertTrue(handled)
         menus.send_image.assert_awaited_once_with(
-            "group", "group", b"single-card", reply_to="message"
+            "group",
+            "group",
+            b"single-card",
+            reply_to="message",
+            keyboard=build_daily_draw_keyboard(),
         )
         menus.send_daily_draw_view.assert_not_awaited()
+
+    async def test_already_drawn_result_marks_card_as_replay(self) -> None:
+        with tempfile.TemporaryDirectory() as folder:
+            root = Path(folder)
+            repository = DrawRepository(root / "draw.sqlite3")
+            await repository.initialize()
+            service = DailyDrawService(
+                write_pool(root / "pool.json"), repository, DrawEngine(FakeRandom())
+            )
+            identity = DrawIdentity("qq_official", "member")
+            await service.draw(identity)
+            menus = SimpleNamespace(send_image=AsyncMock(), send_daily_draw_view=AsyncMock())
+            render = Mock()
+
+            def render_card(record, *, already_drawn=False):
+                render(already_drawn=already_drawn)
+                return b"replayed-card"
+
+            controller = DailyDrawController(
+                service,
+                menus,
+                renderer=SimpleNamespace(render=render_card),
+            )
+            context = SimpleNamespace(
+                content="/每日单抽",
+                platform="qq_official",
+                user_id="member",
+                group_id="group",
+                scene_type="group",
+                message_id="message-2",
+            )
+            await controller.handle_text(context)
+
+        render.assert_called_once_with(already_drawn=True)
 
 
 if __name__ == "__main__":

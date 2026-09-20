@@ -435,6 +435,7 @@ class MenuService:
         *,
         reply_to: str,
         file_name: str = "image.png",
+        keyboard: Any = None,
     ) -> dict[str, Any]:
         """Upload an image and send it as a passive GROUP/C2C reply."""
         upload = RichMediaMessage(
@@ -459,5 +460,5 @@ class MenuService:
             media=MediaInfo(file_info=file_info),
         )
         if scene == "c2c":
-            return await self._api.post_c2c_message(chat_id, message)
-        return await self._api.post_group_message(chat_id, message)
+            return await self._api.post_c2c_message(chat_id, message, keyboard=keyboard)
+        return await self._api.post_group_message(chat_id, message, keyboard=keyboard)
