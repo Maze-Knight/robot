@@ -20,6 +20,17 @@ NO_RECORD = """# 📜 今日抽取记录
 今天还没有进行单抽。名单装填完成后再来。"""
 
 
+def result_action_panel(*, already_drawn: bool) -> str:
+    """Small Markdown reply that carries the interactive result controls.
+
+    QQ does not render native keyboards on a rich-media image.  Keep this
+    deliberately brief: the card above remains the complete result, while this
+    Markdown bubble supplies the two usable next actions.
+    """
+    status = "今日记录已归档。" if already_drawn else "今日首次抽取已归档。"
+    return f"**🎲 抽取操作**\n\n{status}"
+
+
 def record_text(
     record: DrawRecord,
     *,

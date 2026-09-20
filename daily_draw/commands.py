@@ -79,7 +79,18 @@ class DailyDrawController:
                         chat_id,
                         image,
                         reply_to=context.message_id,
-                        keyboard=build_daily_draw_keyboard(),
+                    )
+                    # QQ accepts the keyboard field on a rich-media payload but
+                    # does not render it.  Follow the card with one compact
+                    # Markdown operation panel, where the native controls are
+                    # reliably visible and interactive.
+                    await self._menus.send_daily_draw_view(
+                        context.scene_type,
+                        chat_id,
+                        copy.result_action_panel(
+                            already_drawn=result_already_drawn
+                        ),
+                        reply_to=context.message_id,
                     )
                     return True
                 except Exception:

@@ -7,6 +7,7 @@ from pathlib import Path
 from types import SimpleNamespace
 from unittest.mock import AsyncMock, Mock
 
+from daily_draw import copywriting as draw_copy
 from daily_draw.catalog import DrawCatalog
 from daily_draw.card import DailyDrawCardRenderer
 from daily_draw.commands import DailyDrawController, parse_draw_command
@@ -230,7 +231,7 @@ class DailyDrawControllerTests(unittest.IsolatedAsyncioTestCase):
         menus.send_daily_draw_view.assert_awaited_once()
         self.assertIn("不消耗今日次数", menus.send_daily_draw_view.await_args.args[2])
 
-    async def test_single_pull_sends_only_the_result_card(self) -> None:
+    async def test_single_pull_sends_result_card_and_action_panel(self) -> None:
         with tempfile.TemporaryDirectory() as folder:
             root = Path(folder)
             repository = DrawRepository(root / "draw.sqlite3")
@@ -266,9 +267,13 @@ class DailyDrawControllerTests(unittest.IsolatedAsyncioTestCase):
             "group",
             b"single-card",
             reply_to="message",
-            keyboard=build_daily_draw_keyboard(),
         )
-        menus.send_daily_draw_view.assert_not_awaited()
+        menus.send_daily_draw_view.assert_awaited_once_with(
+            "group",
+            "group",
+            draw_copy.result_action_panel(already_drawn=False),
+            reply_to="message",
+        )
 
     async def test_already_drawn_result_marks_card_as_replay(self) -> None:
         with tempfile.TemporaryDirectory() as folder:
@@ -308,7 +313,12 @@ class DailyDrawControllerTests(unittest.IsolatedAsyncioTestCase):
             "group",
             b"replayed-card",
             reply_to="message-2",
-            keyboard=build_daily_draw_keyboard(),
+        )
+        menus.send_daily_draw_view.assert_awaited_once_with(
+            "group",
+            "group",
+            draw_copy.result_action_panel(already_drawn=True),
+            reply_to="message-2",
         )
 
 
