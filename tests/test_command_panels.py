@@ -85,10 +85,10 @@ class CommandPanelSynchronizerTests(unittest.IsolatedAsyncioTestCase):
             ],
         )
 
-    def test_definition_keeps_all_six_public_commands(self) -> None:
+    def test_definition_keeps_all_seven_public_commands(self) -> None:
         self.assertEqual(PANEL_REMARK, "elena-command-panel-v1")
         self.assertEqual(
             [item["name"] for item in PANEL_ITEMS],
-            ["菜单", "蜡笔板", "蜡笔进度", "礼包查询", "每日单抽", "帮助"],
+            ["菜单", "蜡笔板", "蜡笔进度", "礼包查询", "每日单抽", "雀魂", "帮助"],
         )
         self.assertTrue(all(item["only_admin"] is False for item in PANEL_ITEMS))

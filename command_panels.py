@@ -43,6 +43,12 @@ PANEL_ITEMS: tuple[dict[str, Any], ...] = (
     },
     {
         "type": "command",
+        "name": "雀魂",
+        "desc": "查看雀魂玩家档案",
+        "only_admin": False,
+    },
+    {
+        "type": "command",
         "name": "帮助",
         "desc": "查看终端使用说明",
         "only_admin": False,

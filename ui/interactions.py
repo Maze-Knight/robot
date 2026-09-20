@@ -29,6 +29,7 @@ async def handle_interaction(
     api: Any,
     menus: MenuService,
     trickcal_controller: Any | None = None,
+    majsoul_controller: Any | None = None,
 ) -> None:
     interaction = parse_interaction_event(raw)
     scene = (
@@ -102,6 +103,14 @@ async def handle_interaction(
             )
         elif button_data.startswith("trickcal:") and trickcal_controller is not None:
             await trickcal_controller.handle_interaction(
+                scene,
+                interaction.chat_id,
+                interaction.operator_openid,
+                button_data,
+                follow_up_event_id,
+            )
+        elif button_data.startswith("majsoul:") and majsoul_controller is not None:
+            await majsoul_controller.handle_interaction(
                 scene,
                 interaction.chat_id,
                 interaction.operator_openid,
