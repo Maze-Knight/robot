@@ -5,7 +5,7 @@ import os
 import subprocess
 import sys
 from pathlib import Path
-from typing import Iterable
+from typing import Any, Iterable
 
 
 ENVIRONMENT_KEYS = (
@@ -121,6 +121,64 @@ def git_pull_fast_forward(repository: Path) -> tuple[bool, str]:
         return False, "工作区存在未提交修改。为避免覆盖，请先提交或处理这些修改。"
     code, output = run_git(repository, ["pull", "--ff-only"], timeout=180)
     return code == 0, output
+
+
+def build_distribution(
+    repository: Path, *, stage_manager: bool = False
+) -> tuple[bool, str]:
+    """Build a deployment distribution without exposing command output elsewhere."""
+    script = repository / "build_exe.ps1"
+    if not script.is_file():
+        return False, "未找到 build_exe.ps1，无法构建部署文件。"
+    command = [
+        "powershell",
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        str(script),
+        "-SkipInstall",
+    ]
+    if stage_manager:
+        command.extend(["-ManagerName", "ElenaManager.next"])
+    try:
+        completed = subprocess.run(
+            command,
+            cwd=repository,
+            text=True,
+            capture_output=True,
+            encoding="utf-8",
+            errors="replace",
+            timeout=300,
+        )
+    except (OSError, subprocess.TimeoutExpired) as exc:
+        return False, f"构建未完成：{exc}"
+    output = (completed.stdout + completed.stderr).strip()
+    if completed.returncode:
+        return False, output or "构建失败。"
+    return True, output or "构建完成。"
+
+
+def stop_managed_process(process: Any, *, timeout: int = 15) -> bool:
+    """Stop only the process explicitly launched by this manager, including children."""
+    if process is None or process.poll() is not None:
+        return True
+    try:
+        if os.name == "nt":
+            subprocess.run(
+                ["taskkill", "/PID", str(process.pid), "/T", "/F"],
+                capture_output=True,
+                text=True,
+                encoding="utf-8",
+                errors="replace",
+                timeout=timeout,
+            )
+        else:
+            process.terminate()
+        process.wait(timeout=timeout)
+    except (OSError, subprocess.SubprocessError):
+        return process.poll() is not None
+    return process.poll() is not None
 
 
 def git_commit_and_push(repository: Path, message: str) -> tuple[bool, str]:

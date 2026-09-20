@@ -1,5 +1,6 @@
 param(
-    [switch]$SkipInstall
+    [switch]$SkipInstall,
+    [string]$ManagerName = "ElenaManager"
 )
 
 $ErrorActionPreference = "Stop"
@@ -34,7 +35,7 @@ try {
         --clean `
         --onefile `
         --windowed `
-        --name "ElenaManager" `
+        --name $ManagerName `
         manager.py
     if ($LASTEXITCODE -ne 0) { throw "Failed to build the management EXE." }
 
@@ -46,7 +47,7 @@ try {
 
     Write-Host ""
     Write-Host "Build complete: $ProjectRoot\dist\ElenaBot.exe"
-    Write-Host "Management terminal: $ProjectRoot\dist\ElenaManager.exe"
+    Write-Host "Management terminal: $ProjectRoot\dist\$ManagerName.exe"
     Write-Host "Deploy the dist folder, rename .env.example to .env, and fill in real settings."
 } finally {
     Pop-Location

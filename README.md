@@ -196,7 +196,7 @@ powershell -ExecutionPolicy Bypass -File .\build_exe.ps1
 EXE 不包含任何真实凭证，且带有单实例锁，重复启动不会造成重复回复。
 完整步骤见 [DEPLOY_WINDOWS.md](DEPLOY_WINDOWS.md)。
 
-构建也会生成 `dist\ElenaManager.exe`。它是 Windows 本机管理终端：可以编辑部署目录的 `.env`、启动或停止由它启动的机器人、执行 Git 状态/安全拉取，并在确认后提交推送。Git 操作只对含 `.git` 的完整仓库可用；单独复制到服务器的 `dist` 不会被误认为仓库。
+构建也会生成 `dist\ElenaManager.exe`。它是 Windows 本机管理终端：可以编辑部署目录的 `.env`、启动或停止由它启动的机器人、执行 Git 状态/安全拉取，并在确认后提交推送。完整仓库中可使用“一键更新”：它会拒绝未提交修改，再安全拉取、重建 EXE、替换管理器自身并重启机器人。Git 操作只对含 `.git` 的完整仓库可用；单独复制到服务器的 `dist` 不会被误认为仓库。
 
 也可不创建 `.env`，仅对当前 PowerShell 会话设置环境变量：
 

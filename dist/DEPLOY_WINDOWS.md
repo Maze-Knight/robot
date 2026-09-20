@@ -19,6 +19,7 @@ cd C:\Bots\ElenaBot
 - 只复制 `dist` 到服务器时，管理器仍可管理 `.env` 和机器人；Git 功能会提示没有 `.git`，这是正常的保护行为。
 - 如需在另一台电脑维护代码，请先克隆完整仓库，再从该仓库的 `dist\ElenaManager.exe` 启动管理器。它会自动向上找到 `.git`。
 - “安全拉取”会在存在未提交文件时拒绝执行，避免覆盖本地工作；“.env`、`data`、`logs` 仍由 `.gitignore` 排除。
+- 完整仓库中可点击“一键更新”：它会拒绝未提交修改，安全拉取远程代码、重建机器人 EXE，并自动替换和重启管理器及机器人。完成后仍须在 `logs\bot.log` 中确认 `ONLINE`。
 - 管理器不会读取或写入任何 Access Token，也不会将 `.env` 的值写进终端日志。
 
 `daily_draw_pool.json` 必须和 `ElenaBot.exe` 放在同一目录。Crayon Note 使徒头像已经打包进 EXE；奖池 JSON 负责名称和图片映射。新奖池首次加载时会自动清空旧每日抽取记录与旧图鉴进度。
