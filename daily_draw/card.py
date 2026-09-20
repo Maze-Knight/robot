@@ -9,8 +9,8 @@ from .models import CollectionSnapshot, DrawRecord
 
 
 class DailyDrawCardRenderer:
-    WIDTH = 1000
-    HEIGHT = 650
+    WIDTH = 720
+    HEIGHT = 720
 
     def __init__(self, asset_dir: Path) -> None:
         self.asset_dir = asset_dir
@@ -27,37 +27,40 @@ class DailyDrawCardRenderer:
         return ImageFont.load_default()
 
     def render(self, record: DrawRecord) -> bytes:
-        canvas = Image.new("RGB", (self.WIDTH, self.HEIGHT), "#0d1b2a")
+        if not record.items:
+            raise ValueError("daily draw record has no item")
+        item = record.items[0]
+        canvas = Image.new("RGB", (self.WIDTH, self.HEIGHT), "#fff7e8")
         draw = ImageDraw.Draw(canvas)
-        title_font = self._font(36, bold=True)
-        name_font = self._font(21, bold=True)
-        small_font = self._font(16)
-        draw.text((42, 24), "莫纳提姆 · 每日十连", font=title_font, fill="#f5f7fa")
-        draw.text((650, 35), record.draw_date, font=small_font, fill="#91a4b7")
-
-        card_w, card_h = 176, 245
-        start_x, start_y, gap_x, gap_y = 42, 90, 16, 22
-        card_color = "#55b8de"
-        for index, item in enumerate(record.items):
-            row, column = divmod(index, 5)
-            x = start_x + column * (card_w + gap_x)
-            y = start_y + row * (card_h + gap_y)
-            draw.rounded_rectangle(
-                (x, y, x + card_w, y + card_h),
-                radius=16,
-                fill="#15283a",
-                outline=card_color,
-                width=4,
-            )
-            portrait = self._load_portrait(item.image)
-            canvas.paste(portrait, (x + 12, y + 12))
-            self._draw_centered_name(draw, item.name, x, y + 190, card_w, name_font)
-
+        title_font = self._font(42, bold=True)
+        name_font = self._font(48, bold=True)
+        small_font = self._font(20)
+        draw.rounded_rectangle(
+            (28, 28, self.WIDTH - 28, self.HEIGHT - 28),
+            radius=28,
+            fill="#fffdf7",
+            outline="#f6b84c",
+            width=4,
+        )
+        draw.text((62, 58), "莫纳提姆 · 每日单抽", font=title_font, fill="#263a66")
+        draw.text((62, 116), record.draw_date, font=small_font, fill="#8d7c6b")
+        draw.rounded_rectangle(
+            (110, 164, 610, 564),
+            radius=28,
+            fill="#f3e8fb",
+            outline="#8068d8",
+            width=5,
+        )
+        portrait = self._load_portrait(item.image, size=360)
+        canvas.paste(portrait, (180, 184))
+        self._draw_centered_name(draw, item.name, 62, 586, self.WIDTH - 124, name_font, fill="#263a66")
+        footer = "抽取完成。结果当然已经算好了。"
+        footer_box = draw.textbbox((0, 0), footer, font=small_font)
         draw.text(
-            (42, 620),
-            "系统计算完成。结果当然在预期之内。",
+            ((self.WIDTH - (footer_box[2] - footer_box[0])) / 2, 654),
+            footer,
             font=small_font,
-            fill="#91a4b7",
+            fill="#8d7c6b",
         )
         output = io.BytesIO()
         canvas.save(output, format="PNG", optimize=True)

@@ -15,13 +15,13 @@ class RandomSource(Protocol):
 
 
 class DrawEngine:
-    """Ten independent selections from one uniformly weighted pool."""
+    """One uniformly weighted daily selection from the configured pool."""
 
     def __init__(self, rng: RandomSource | None = None) -> None:
         self._rng = rng or random.SystemRandom()
 
-    def draw_ten(self, catalog: DrawCatalog) -> tuple[DrawItem, ...]:
+    def draw_one(self, catalog: DrawCatalog) -> DrawItem:
         if not catalog.ready:
             raise ValueError("抽取名单尚未完整配置")
         pool = catalog.items()
-        return tuple(self._rng.choice(pool) for _ in range(10))
+        return self._rng.choice(pool)

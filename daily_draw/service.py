@@ -63,7 +63,7 @@ class DailyDrawService:
         record = DrawRecord(
             identity=identity,
             draw_date=draw_date,
-            items=self.engine.draw_ten(self.catalog),
+            items=(self.engine.draw_one(self.catalog),),
             created_at=datetime.now(CHINA_TZ).isoformat(timespec="seconds"),
         )
         stored, inserted = await self.repository.save_if_absent(record)

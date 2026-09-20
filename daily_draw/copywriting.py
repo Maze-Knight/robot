@@ -3,13 +3,13 @@ from __future__ import annotations
 from .models import CollectionSnapshot, CollectionUpdate, DrawRecord
 
 
-HOME = """# 🎲 每日抽取
+HOME = """# 🎲 每日单抽
 
-每天可进行一次十连。
+每天可进行一次单抽。
 
-全部使徒属于同一抽取级别，每一抽等概率。规则已经校准，照着抽就行。"""
+全部使徒属于同一抽取级别，每次等概率。规则已经校准，照着抽就行。"""
 
-POOL_NOT_READY = """# 🎲 每日抽取
+POOL_NOT_READY = """# 🎲 每日单抽
 
 抽取名单还没装填。
 
@@ -17,7 +17,7 @@ POOL_NOT_READY = """# 🎲 每日抽取
 
 NO_RECORD = """# 📜 今日抽取记录
 
-今天还没有进行十连。名单装填完成后再来。"""
+今天还没有进行单抽。名单装填完成后再来。"""
 
 
 def record_text(
@@ -31,7 +31,7 @@ def record_text(
         f"{index}. **{item.name}**"
         for index, item in enumerate(record.items, start=1)
     ]
-    result = f"# 🎲 每日十连\n\n{heading}\n\n" + "\n".join(lines)
+    result = f"# 🎲 每日单抽\n\n{heading}\n\n" + "\n".join(lines)
     if updates:
         new_items = [update.item.name for update in updates if update.is_new]
         upgraded = [

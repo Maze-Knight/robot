@@ -14,10 +14,8 @@ logger = logging.getLogger("elena.qq.daily_draw")
 def parse_draw_command(content: str) -> str | None:
     command = content.strip().casefold()
     commands = {
-        "每日抽取": "draw",
-        "/每日抽取": "draw",
-        "进行十连": "draw",
-        "/进行十连": "draw",
+        "每日单抽": "draw",
+        "/每日单抽": "draw",
         "今日抽取": "record",
         "/今日抽取": "record",
         "抽取记录": "record",
@@ -75,6 +73,7 @@ class DailyDrawController:
                         image,
                         reply_to=context.message_id,
                     )
+                    return True
                 except Exception:
                     # The complete text result is still sent if image rendering or
                     # upload has a transient failure.

@@ -35,26 +35,26 @@ QQ 的指令面板 API 会自动去掉名称中的 `/`，而呈现和填入方�
 [📢 公告记录] [📖 使用说明]
 ```
 
-菜单最大深度为主菜单到二级菜单。Steam 监测站、礼包性价比查询、每日抽取和使徒图鉴已经接入；实验功能仍是占位回复。角色文案集中在各模块的 `copywriting.py`；菜单页面、键盘和 Interaction 路由分别位于 `ui/menus.py`、`ui/keyboards.py`、`ui/interactions.py`。
+菜单最大深度为主菜单到二级菜单。Steam 监测站、礼包性价比查询、每日单抽和使徒图鉴已经接入；实验功能仍是占位回复。角色文案集中在各模块的 `copywriting.py`；菜单页面、键盘和 Interaction 路由分别位于 `ui/menus.py`、`ui/keyboards.py`、`ui/interactions.py`。
 
 当前不包含 NoneBot2、AI 或其他未迁移业务插件。
 
-### 每日抽取
+### 每日单抽
 
-发送 `/每日抽取` 会立即执行当天十连，不再经过确认页面。`/进行十连` 作为兼容指令保留，`/抽取记录` 可重新查看当天结果：
+发送 `/每日单抽` 会立即执行当天单抽，不经过确认页面；`/抽取记录` 可重新查看当天结果：
 
 ```text
-/进行十连
+/每日单抽
 /抽取记录
 ```
 
-当前规则固定为：每个 QQ 官方身份每天一次十连；所有使徒属于同一个抽取级别，每一抽都从完整名单中等概率独立选择，不设稀有度和保底。日期按北京时间计算，结果保存在 `data/daily_draw.sqlite3`，并通过数据库唯一约束避免并发重复抽取。
+当前规则固定为：每个 QQ 官方身份每天一次单抽；所有使徒属于同一个抽取级别，从完整名单中等概率独立选择，不设稀有度和保底。日期按北京时间计算，结果保存在 `data/daily_draw.sqlite3`，并通过数据库唯一约束避免并发重复抽取。
 
-抽取名单取自 [Crayon Note 自订角色清单](https://crayon-note.vercel.app/checklist.html)。当前同步到 78 名使徒；头像由该页面实际使用的五张人物雪碧图按其 CSS 坐标裁切。十连结果会生成包含头像和名称的图片卡片。
+抽取名单取自 [Crayon Note 自订角色清单](https://crayon-note.vercel.app/checklist.html)。当前同步到 78 名使徒；头像由该页面实际使用的五张人物雪碧图按其 CSS 坐标裁切。单抽结果会生成只显示该名使徒头像和名称的图片卡片。
 
 清单保存在 `daily_draw_pool.json`，头像位于 `daily_draw_assets/`。需要重新同步源站后可运行 `python scripts/sync_crayon_note_daily_draw.py`，构建 EXE 时头像会打包进程序，部署目录中的奖池 JSON 仍用于控制启用名单。
 
-此次切换使用新的 `pool_id`。程序首次加载该奖池时会在一个事务内清空旧奖池产生的每日次数、抽取记录和图鉴进度；不会保留或转换旧用户数据。
+此次切换使用新的 `pool_id`。程序首次加载单抽奖池时会在一个事务内清空旧十连产生的每日次数、抽取记录和图鉴进度；不会保留或转换旧用户数据。
 
 ### 使徒图鉴
 
@@ -118,7 +118,7 @@ qq-official-bot/
 ├─ requirements.txt         # 固定官方 SDK 版本及直接依赖
 ├─ README.md                # 本文档
 ├─ gifts/                   # 礼包网站只读 API、期次查询与展示
-├─ daily_draw/              # 每日十连、次数控制、图鉴与结果记录
+├─ daily_draw/              # 每日单抽、次数控制、图鉴与结果记录
 ├─ daily_draw_pool.json     # Crayon Note 使徒名单与头像映射
 ├─ steam/                   # Steam 主动查询与身份绑定
 ├─ ui/                      # Markdown 菜单和中文指令按钮

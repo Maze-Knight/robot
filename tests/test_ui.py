@@ -102,7 +102,7 @@ class KeyboardTests(unittest.TestCase):
             [
                 "/Steam监测站",
                 "/礼包查询",
-                "/每日抽取",
+                "/每日单抽",
                 "/图鉴",
                 "/蜡笔板",
                 "/返回终端",
@@ -134,11 +134,11 @@ class KeyboardTests(unittest.TestCase):
     def test_daily_draw_buttons_emit_chinese_commands(self) -> None:
         self.assertEqual(
             self._button_data(build_daily_draw_keyboard()),
-            ["/进行十连", "/抽取记录", "/市政服务"],
+            ["/每日单抽", "/抽取记录", "/市政服务"],
         )
         self.assertEqual(
             self._button_data(build_collection_keyboard()),
-            ["/图鉴", "/每日抽取", "/市政服务"],
+            ["/图鉴", "/每日单抽", "/市政服务"],
         )
 
     def test_steam_menu_is_shallow_and_uses_stable_data(self) -> None:

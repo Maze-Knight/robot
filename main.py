@@ -162,7 +162,7 @@ async def handle_message(context: MessageContext) -> None:
     for handler_name, handler in (
         ("Steam消息", context.steam_handler),
         ("礼包查询", context.gift_handler),
-        ("每日抽取", context.draw_handler),
+        ("每日单抽", context.draw_handler),
         ("蜡笔板", context.trickcal_handler),
         ("菜单指令", context.menu_handler),
     ):
@@ -416,7 +416,7 @@ async def run_bot(settings: Settings) -> None:
             gift_client.configured,
         )
         logger.info(
-            "[DAILY_DRAW] initialized | pool_ready=%s | daily_limit=1x10",
+            "[DAILY_DRAW] initialized | pool_ready=%s | daily_limit=1x1",
             draw_catalog.ready,
         )
 

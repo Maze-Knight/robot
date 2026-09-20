@@ -131,7 +131,7 @@ def build_services_keyboard() -> InlineKeyboard:
                 _command_button("service_gifts", "🎁 礼包性价比", "/礼包查询"),
             ],
             [
-                _command_button("service_draw", "🎲 每日抽取", "/每日抽取"),
+                _command_button("service_draw", "🎲 每日单抽", "/每日单抽"),
                 _command_button("service_collection", "📖 图鉴", "/图鉴"),
             ],
             [
@@ -176,7 +176,7 @@ def build_daily_draw_keyboard() -> InlineKeyboard:
     return _keyboard(
         [
             [
-                _command_button("draw_ten", "🎲 进行十连", "/进行十连"),
+                _command_button("draw_one", "🎲 每日单抽", "/每日单抽"),
                 _command_button("draw_record", "📜 今日记录", "/抽取记录"),
             ],
             [
@@ -191,7 +191,7 @@ def build_collection_keyboard() -> InlineKeyboard:
         [
             [
                 _command_button("collection_refresh", "🔄 刷新图鉴", "/图鉴"),
-                _command_button("collection_draw", "🎲 每日抽取", "/每日抽取"),
+                _command_button("collection_draw", "🎲 每日单抽", "/每日单抽"),
             ],
             [
                 _command_button("collection_back", "🔙 市政服务", "/市政服务", style=0),

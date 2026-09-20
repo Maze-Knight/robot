@@ -4,6 +4,7 @@ import json
 import tempfile
 import unittest
 from pathlib import Path
+from types import SimpleNamespace
 from unittest.mock import AsyncMock
 
 from daily_draw.catalog import DrawCatalog
@@ -37,15 +38,14 @@ def write_pool(path: Path, *, ready: bool = True) -> DrawCatalog:
 
 
 class DrawEngineTests(unittest.TestCase):
-    def test_ten_pull_uses_one_uniform_pool(self) -> None:
+    def test_single_pull_uses_one_uniform_pool(self) -> None:
         with tempfile.TemporaryDirectory() as folder:
             catalog = write_pool(Path(folder) / "pool.json")
-            engine = DrawEngine(FakeRandom(list(range(10))))
-            result = engine.draw_ten(catalog)
-        self.assertEqual(len(result), 10)
-        self.assertEqual([item.item_id for item in result], ["one", "two"] * 5)
+            engine = DrawEngine(FakeRandom([1]))
+            result = engine.draw_one(catalog)
+        self.assertEqual(result.item_id, "two")
 
-    def test_renderer_builds_ten_pull_png_with_portraits(self) -> None:
+    def test_renderer_builds_single_pull_png_with_portrait(self) -> None:
         from daily_draw.models import DrawItem, DrawRecord
 
         with tempfile.TemporaryDirectory() as folder:
@@ -55,12 +55,12 @@ class DrawEngineTests(unittest.TestCase):
             record = DrawRecord(
                 DrawIdentity("qq_official", "member"),
                 "2026-09-15",
-                (item,) * 10,
+                (item,),
                 "2026-09-15T12:00:00+08:00",
             )
             rendered = DailyDrawCardRenderer(root).render(record)
             with Image.open(__import__("io").BytesIO(rendered)) as image:
-                self.assertEqual(image.size, (1000, 650))
+                self.assertEqual(image.size, (720, 720))
                 self.assertEqual(image.format, "PNG")
 
     def test_renderer_builds_complete_collection_grid(self) -> None:
@@ -101,7 +101,7 @@ class DailyDrawServiceTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(outcome.state, "pool_not_ready")
         self.assertIsNone(stored)
 
-    async def test_second_ten_pull_returns_first_record(self) -> None:
+    async def test_second_single_pull_returns_first_record(self) -> None:
         with tempfile.TemporaryDirectory() as folder:
             root = Path(folder)
             repository = DrawRepository(root / "draw.sqlite3")
@@ -118,10 +118,10 @@ class DailyDrawServiceTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(second.state, "already_drawn")
         self.assertEqual(first.record, second.record)
         self.assertEqual(len(first.updates), 1)
-        self.assertEqual(first.updates[0].copies, 10)
-        self.assertEqual(first.updates[0].current_stars, 10)
+        self.assertEqual(first.updates[0].copies, 1)
+        self.assertEqual(first.updates[0].current_stars, 1)
         self.assertEqual(collection.unlocked_count, 1)
-        self.assertEqual(collection.entries[0].copies, 10)
+        self.assertEqual(collection.entries[0].copies, 1)
 
     async def test_group_scoped_history_migrates_to_user_collection(self) -> None:
         with tempfile.TemporaryDirectory() as folder:
@@ -143,7 +143,7 @@ class DailyDrawServiceTests(unittest.IsolatedAsyncioTestCase):
 
         self.assertIsNotNone(record)
         self.assertEqual(collection.unlocked_count, 1)
-        self.assertEqual(collection.entries[0].copies, 10)
+        self.assertEqual(collection.entries[0].copies, 1)
 
     async def test_pool_change_clears_old_draws_and_collection(self) -> None:
         with tempfile.TemporaryDirectory() as folder:
@@ -167,8 +167,10 @@ class DailyDrawServiceTests(unittest.IsolatedAsyncioTestCase):
 
 class DailyDrawControllerTests(unittest.IsolatedAsyncioTestCase):
     def test_commands_are_chinese(self) -> None:
-        self.assertEqual(parse_draw_command("/每日抽取"), "draw")
-        self.assertEqual(parse_draw_command("/进行十连"), "draw")
+        self.assertEqual(parse_draw_command("/每日单抽"), "draw")
+        self.assertEqual(parse_draw_command("每日单抽"), "draw")
+        self.assertIsNone(parse_draw_command("/每日抽取"))
+        self.assertIsNone(parse_draw_command("/进行十连"))
         self.assertEqual(parse_draw_command("/抽取记录"), "record")
         self.assertEqual(parse_draw_command("/图鉴"), "collection")
         self.assertIsNone(parse_draw_command("/daily draw"))
@@ -187,7 +189,7 @@ class DailyDrawControllerTests(unittest.IsolatedAsyncioTestCase):
                 "Context",
                 (),
                 {
-                    "content": "/进行十连",
+                    "content": "/每日单抽",
                     "platform": "qq_official",
                     "user_id": "member",
                     "group_id": "group",
@@ -199,6 +201,40 @@ class DailyDrawControllerTests(unittest.IsolatedAsyncioTestCase):
         self.assertTrue(handled)
         menus.send_daily_draw_view.assert_awaited_once()
         self.assertIn("不消耗今日次数", menus.send_daily_draw_view.await_args.args[2])
+
+    async def test_single_pull_sends_only_the_result_card(self) -> None:
+        with tempfile.TemporaryDirectory() as folder:
+            root = Path(folder)
+            repository = DrawRepository(root / "draw.sqlite3")
+            await repository.initialize()
+            service = DailyDrawService(
+                write_pool(root / "pool.json"), repository, DrawEngine(FakeRandom())
+            )
+            menus = SimpleNamespace(
+                send_image=AsyncMock(),
+                send_daily_draw_view=AsyncMock(),
+            )
+            controller = DailyDrawController(
+                service,
+                menus,
+                renderer=SimpleNamespace(render=lambda record: b"single-card"),
+            )
+            context = SimpleNamespace(
+                content="/每日单抽",
+                platform="qq_official",
+                user_id="member",
+                group_id="group",
+                scene_type="group",
+                message_id="message",
+            )
+
+            handled = await controller.handle_text(context)
+
+        self.assertTrue(handled)
+        menus.send_image.assert_awaited_once_with(
+            "group", "group", b"single-card", reply_to="message"
+        )
+        menus.send_daily_draw_view.assert_not_awaited()
 
 
 if __name__ == "__main__":
