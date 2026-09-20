@@ -35,7 +35,7 @@ QQ 的指令面板 API 会自动去掉名称中的 `/`，而呈现和填入方�
 [📢 公告记录] [📖 使用说明]
 ```
 
-菜单最大深度为主菜单到二级菜单。Steam 监测站、礼包性价比查询、每日单抽和使徒图鉴已经接入；实验功能仍是占位回复。角色文案集中在各模块的 `copywriting.py`；菜单页面、键盘和 Interaction 路由分别位于 `ui/menus.py`、`ui/keyboards.py`、`ui/interactions.py`。
+菜单最大深度为主菜单到二级菜单。礼包性价比查询、每日单抽、使徒图鉴和蜡笔板已经接入；实验功能仍是占位回复。角色文案集中在各模块的 `copywriting.py`；菜单页面、键盘和 Interaction 路由分别位于 `ui/menus.py`、`ui/keyboards.py`、`ui/interactions.py`。
 
 当前不包含 NoneBot2、AI 或其他未迁移业务插件。
 
@@ -120,7 +120,6 @@ qq-official-bot/
 ├─ gifts/                   # 礼包网站只读 API、期次查询与展示
 ├─ daily_draw/              # 每日单抽、次数控制、图鉴与结果记录
 ├─ daily_draw_pool.json     # Crayon Note 使徒名单与头像映射
-├─ steam/                   # Steam 主动查询与身份绑定
 ├─ ui/                      # Markdown 菜单和中文指令按钮
 ├─ logs/
 │  └─ .gitkeep              # 保留空日志目录
@@ -359,71 +358,6 @@ GET /api/ratings/enabled
 ```
 
 压缩包不包含线上数据库或部署域名，因此只有填写真实 `GIFT_API_BASE_URL` 后，才能进行真实每期数据联调。
-
-## 🎮 Steam 监测站（第一阶段）
-
-Steam 已归入“市政终端 → 市政服务 → Steam 监测站”。监测站首页只有四个按钮：
-
-- `👤 我的档案` → `steam:profile`
-- `📡 当前状态` → `steam:status`
-- `🔗 身份登记` → `steam:bind`
-- `🔙 返回市政服务` → `steam:back`
-
-第一阶段只启用主动查询。自动监测、上线/下线、开始/停止/切换游戏和主动群通知尚未调度，`STEAM_MONITOR_ENABLED` 必须保持 `false`。
-
-### Steam 配置
-
-登录 [Steam Web API Key 页面](https://steamcommunity.com/dev/apikey) 创建 Key，然后只在本机 `.env` 中填写：
-
-```dotenv
-STEAM_API_KEY=你的真实Key
-STEAM_MONITOR_ENABLED=false
-```
-
-可选参数：
-
-```dotenv
-STEAM_API_BASE=https://api.steampowered.com
-STEAM_REQUEST_TIMEOUT=15
-STEAM_RETRY_TIMES=2
-```
-
-程序使用 Valve 当前文档中的 `ISteamUser/GetPlayerSummaries/v2` 与 `ISteamUser/ResolveVanityURL/v1`。Key 只作为请求参数传给 Steam，不写入数据库，也会被日志过滤器脱敏。参考：[Valve ISteamUser Web API 文档](https://partner.steamgames.com/doc/webapi/ISteamUser)。
-
-### 身份与数据库
-
-绑定数据写入 `data/steam.sqlite3` 的 `steam_platform_bindings` 表。表使用：
-
-```text
-platform + user_id + group_id → steam_id
-```
-
-QQ群使用 `member_openid + group_openid`，C2C 使用该会话的用户 `openid`，不读取或假定传统 QQ 号。GROUP 与 C2C 的官方 openid 可能不同，因此需要分别登记。建表只使用 `CREATE TABLE IF NOT EXISTS`；旧插件、旧 JSON 和旧数据库不会被改写或删除。
-
-### 文本命令
-
-群聊需要先 `@艾琳娜`，C2C 直接发送：
-
-```text
-steam
-steam状态
-我的steam
-绑定steam 7656119xxxxxxxxxx
-steam绑定 7656119xxxxxxxxxx
-解绑steam
-```
-
-身份登记支持 SteamID64、好友码、`steamcommunity.com/profiles/...` 和 `steamcommunity.com/id/...`。Vanity URL 需要有效 `STEAM_API_KEY` 才能解析。
-
-`GetPlayerSummaries` 能返回当前游戏，但不提供游戏开始时间。“本终端已持续观测”从首次查询到同一游戏时开始计时，不伪造成 Steam 的完整游戏时长；第二阶段自动轮询启用后才会形成连续监测数据。
-
-### Steam 错误排查
-
-- 提示接口参数未登记：检查 `.env` 中的 `STEAM_API_KEY`，重启程序。
-- HTTP 401/403：Key 无效、不可用或被 Steam 拒绝。
-- HTTP 429：触发 Steam 限流，等待后重试。
-- 超时/网络失败：检查本机到 `api.steampowered.com` 的网络；当前阶段未自动继承旧机器人的代理配置。
-- 玩家不存在：确认 SteamID/好友码正确；部分字段是否展示还受 Steam 个人资料隐私设置影响。
 
 ## 自检
 

@@ -43,7 +43,6 @@ class MessageContext:
     reply: ReplyFunction = field(repr=False)
     show_main_menu: UIFunction | None = field(default=None, repr=False)
     show_markdown_test: UIFunction | None = field(default=None, repr=False)
-    steam_handler: PluginHandler | None = field(default=None, repr=False)
     gift_handler: PluginHandler | None = field(default=None, repr=False)
     draw_handler: PluginHandler | None = field(default=None, repr=False)
     menu_handler: PluginHandler | None = field(default=None, repr=False)
@@ -100,7 +99,7 @@ def configure_logging(settings: Settings) -> None:
         datefmt="%Y-%m-%d %H:%M:%S",
     )
     redactor = SecretRedactionFilter(
-        (settings.app_secret, settings.steam_api_key, settings.trickcal_bot_api_key)
+        (settings.app_secret, settings.trickcal_bot_api_key)
     )
 
     console = logging.StreamHandler()
@@ -160,7 +159,6 @@ async def handle_message(context: MessageContext) -> None:
         return
 
     for handler_name, handler in (
-        ("Steam消息", context.steam_handler),
         ("礼包查询", context.gift_handler),
         ("每日单抽", context.draw_handler),
         ("蜡笔板", context.trickcal_handler),
@@ -195,7 +193,6 @@ def make_message_context(
     *,
     show_main_menu: UIFunction | None = None,
     show_markdown_test: UIFunction | None = None,
-    steam_handler: PluginHandler | None = None,
     gift_handler: PluginHandler | None = None,
     draw_handler: PluginHandler | None = None,
     menu_handler: PluginHandler | None = None,
@@ -224,7 +221,6 @@ def make_message_context(
         reply=reply,
         show_main_menu=show_main_menu,
         show_markdown_test=show_markdown_test,
-        steam_handler=steam_handler,
         gift_handler=gift_handler,
         draw_handler=draw_handler,
         menu_handler=menu_handler,
@@ -248,11 +244,6 @@ async def run_bot(settings: Settings) -> None:
     from command_panels import CommandPanelSynchronizer
     from ui.interactions import handle_interaction
     from ui.menus import MenuService, TerminalStatus
-    from steam.client import SteamClient
-    from steam.commands import SteamController
-    from steam.monitor import SteamMonitor
-    from steam.repository import SteamRepository
-    from steam.service import SteamService
     from gifts.client import GiftApiClient
     from gifts.commands import GiftController
     from gifts.service import GiftQueryService
@@ -289,25 +280,8 @@ async def run_bot(settings: Settings) -> None:
         api.setup(http_client)
         terminal_status = TerminalStatus()
         menus = MenuService(api, terminal_status)
-        steam_repository = SteamRepository(
-            APP_DIR / "data" / "steam.sqlite3"
-        )
-        await steam_repository.initialize()
-        steam_client = SteamClient(
-            http_client,
-            settings.steam_api_key,
-            api_base=settings.steam_api_base,
-            timeout=settings.steam_request_timeout,
-            retries=settings.steam_retry_times,
-        )
-        steam_service = SteamService(steam_client, steam_repository)
-        from steam.card import SteamCardRenderer
         from trickcal.card import TrickcalProgressCardRenderer
 
-        steam_card_renderer = SteamCardRenderer(http_client)
-        steam_controller = SteamController(
-            steam_service, menus, steam_card_renderer.render
-        )
         gift_client = GiftApiClient(
             http_client,
             settings.gift_api_base_url,
@@ -402,15 +376,6 @@ async def run_bot(settings: Settings) -> None:
         else:
             trickcal_controller = TrickcalController(None, menus, mode="disabled")
             logger.info("[TRICKCAL] module disabled by TRICKCAL_MODE")
-        steam_monitor = SteamMonitor(settings.steam_monitor_enabled)
-        if steam_monitor.enabled:
-            logger.warning(
-                "[STEAM] STEAM_MONITOR_ENABLED=true ignored: phase-two scheduler is inactive"
-            )
-        logger.info(
-            "[STEAM] active query initialized | api_key_configured=%s | monitor_enabled=false",
-            steam_client.configured,
-        )
         logger.info(
             "[GIFT] query initialized | api_configured=%s",
             gift_client.configured,
@@ -437,7 +402,6 @@ async def run_bot(settings: Settings) -> None:
                     show_markdown_test=lambda: menus.send_action_test_menu(
                         event.chat_scope, event.chat_id, event.message_id
                     ),
-                    steam_handler=steam_controller.handle_text,
                     gift_handler=gift_controller.handle_text,
                     draw_handler=draw_controller.handle_text,
                     menu_handler=menus.handle_text,
@@ -465,7 +429,7 @@ async def run_bot(settings: Settings) -> None:
         ) -> None:
             try:
                 await handle_interaction(
-                    event_type, raw, api, menus, steam_controller, trickcal_controller
+                    event_type, raw, api, menus, trickcal_controller
                 )
             except Exception:
                 logger.exception("交互事件处理异常 | event_type=%s", event_type)

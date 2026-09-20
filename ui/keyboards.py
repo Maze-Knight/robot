@@ -126,10 +126,7 @@ def build_main_keyboard() -> InlineKeyboard:
 def build_services_keyboard() -> InlineKeyboard:
     return _keyboard(
         [
-            [
-                _command_button("service_steam", "🎮 Steam 监测站", "/Steam监测站"),
-                _command_button("service_gifts", "🎁 礼包性价比", "/礼包查询"),
-            ],
+            [_command_button("service_gifts", "🎁 礼包性价比", "/礼包查询")],
             [
                 _command_button("service_draw", "🎲 每日单抽", "/每日单抽"),
                 _command_button("service_collection", "📖 图鉴", "/图鉴"),
@@ -241,43 +238,6 @@ def build_gift_periods_keyboard(
     )
     rows.append(navigation)
     return _keyboard(rows)
-
-
-def build_steam_keyboard() -> InlineKeyboard:
-    return _keyboard(
-        [
-            [
-                _command_button("steam_profile", "👤 我的档案", "/我的档案"),
-                _command_button("steam_status", "📡 当前状态", "/当前状态"),
-            ],
-            [
-                _command_button("steam_bind", "🔗 身份登记", "/身份登记"),
-                _command_button("steam_back", "🔙 返回市政服务", "/市政服务", style=0),
-            ],
-        ]
-    )
-
-
-def build_steam_result_keyboard() -> InlineKeyboard:
-    return _keyboard(
-        [
-            [
-                _command_button("steam_unbind", "❌ 解除登记", "/解除登记", style=0),
-                _command_button("steam_result_back", "🔙 返回监测站", "/Steam监测站", style=0),
-            ]
-        ]
-    )
-
-
-def build_steam_unbound_keyboard() -> InlineKeyboard:
-    return _keyboard(
-        [
-            [
-                _command_button("steam_unbound_bind", "🔗 身份登记", "/身份登记"),
-                _command_button("steam_unbound_back", "🔙 返回监测站", "/Steam监测站", style=0),
-            ]
-        ]
-    )
 
 
 def build_experiments_keyboard() -> InlineKeyboard:

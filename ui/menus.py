@@ -17,14 +17,10 @@ from .keyboards import (
     build_main_keyboard,
     build_notices_keyboard,
     build_services_keyboard,
-    build_steam_keyboard,
-    build_steam_result_keyboard,
-    build_steam_unbound_keyboard,
     build_trickcal_keyboard,
     build_trickcal_empty_keyboard,
     build_trickcal_login_keyboard,
 )
-from steam import copywriting as steam_copy
 from qqbot_agent_sdk import MediaInfo, MessageToCreate, QQMessageType
 from qqbot_agent_sdk.constants import MEDIA_TYPE_IMAGE
 from qqbot_agent_sdk.dto import RichMediaMessage
@@ -77,7 +73,6 @@ class MenuService:
             "/使用说明": self.send_help_menu,
             "/帮助": self.send_help_menu,
             "帮助": self.send_help_menu,
-            "/steam监测站": self.send_steam_home,
             "/蜡笔板": self.send_trickcal_home,
         }
         menu_action = menu_actions.get(command)
@@ -157,23 +152,6 @@ class MenuService:
             chat_id,
             copy.SERVICES_MARKDOWN,
             build_services_keyboard(),
-            reply_to=reply_to,
-            event_id=event_id,
-        )
-
-    async def send_steam_home(
-        self,
-        scene: str,
-        chat_id: str,
-        reply_to: str | None = None,
-        *,
-        event_id: str | None = None,
-    ) -> dict[str, Any]:
-        return await self._send_markdown_keyboard(
-            scene,
-            chat_id,
-            steam_copy.STEAM_HOME,
-            build_steam_keyboard(),
             reply_to=reply_to,
             event_id=event_id,
         )
@@ -267,23 +245,6 @@ class MenuService:
             content,
             build_collection_keyboard(),
             reply_to=reply_to,
-        )
-
-    async def send_steam_result(
-        self,
-        scene: str,
-        chat_id: str,
-        content: str,
-        *,
-        bound: bool = True,
-        event_id: str | None = None,
-    ) -> dict[str, Any]:
-        return await self._send_markdown_keyboard(
-            scene,
-            chat_id,
-            content,
-            build_steam_result_keyboard() if bound else build_steam_unbound_keyboard(),
-            event_id=event_id,
         )
 
     async def send_gift_view(
@@ -445,7 +406,7 @@ class MenuService:
         image: bytes,
         *,
         reply_to: str,
-        file_name: str = "steam-status.png",
+        file_name: str = "image.png",
     ) -> dict[str, Any]:
         """Upload an image and send it as a passive GROUP/C2C reply."""
         upload = RichMediaMessage(

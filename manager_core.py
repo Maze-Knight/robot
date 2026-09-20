@@ -11,8 +11,6 @@ from typing import Iterable
 ENVIRONMENT_KEYS = (
     "QQ_APP_ID",
     "QQ_APP_SECRET",
-    "STEAM_API_KEY",
-    "STEAM_MONITOR_ENABLED",
     "GIFT_API_BASE_URL",
     "TRICKCAL_MODE",
     "TRICKCAL_API_BASE_URL",

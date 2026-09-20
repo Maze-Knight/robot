@@ -4,7 +4,7 @@
 
 1. 将构建得到的整个 `dist` 目录复制到 Windows 服务器。
 2. 把 `.env.example` 复制或重命名为 `.env`。
-3. 在 `.env` 中填写 `QQ_APP_ID`、`QQ_APP_SECRET`、`STEAM_API_KEY` 和礼包网站地址。
+3. 在 `.env` 中填写 `QQ_APP_ID`、`QQ_APP_SECRET`、礼包网站地址和蜡笔板所需变量。
 4. 双击 `ElenaBot.exe`，或在 PowerShell 中运行：
 
 ```powershell
@@ -12,7 +12,7 @@ cd C:\Bots\ElenaBot
 .\ElenaBot.exe
 ```
 
-出现 `ONLINE（Gateway 已 READY/RESUMED）` 才表示连接成功。日志写入 EXE 同目录的 `logs\bot.log`，Steam 身份数据写入 `data\steam.sqlite3`，每日抽取记录写入 `data\daily_draw.sqlite3`。
+出现 `ONLINE（Gateway 已 READY/RESUMED）` 才表示连接成功。日志写入 EXE 同目录的 `logs\bot.log`，每日抽取记录写入 `data\daily_draw.sqlite3`。
 
 同目录的 `ElenaManager.exe` 是本机管理终端，可安全编辑该部署目录的 `.env`、启动/停止它自己启动的机器人、查看 Git 状态、安全拉取，以及在输入提交说明并确认后提交和推送。
 

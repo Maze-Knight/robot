@@ -21,11 +21,6 @@ class Settings:
     api_base: str
     token_url: str
     log_level: str
-    steam_api_key: str
-    steam_api_base: str
-    steam_request_timeout: float
-    steam_retry_times: int
-    steam_monitor_enabled: bool
     gift_api_base_url: str
     gift_request_timeout: float
     trickcal_mode: str
@@ -67,8 +62,6 @@ def load_settings() -> Settings:
         )
 
     try:
-        steam_timeout = float(os.getenv("STEAM_REQUEST_TIMEOUT", "15"))
-        steam_retries = int(os.getenv("STEAM_RETRY_TIMES", "2"))
         gift_timeout = float(os.getenv("GIFT_REQUEST_TIMEOUT", "15"))
         trickcal_session_days = int(os.getenv("TRICKCAL_WEB_SESSION_DAYS", "30"))
         trickcal_ticket_minutes = int(
@@ -76,7 +69,6 @@ def load_settings() -> Settings:
         )
     except ValueError as exc:
         raise ConfigurationError(
-            "STEAM_REQUEST_TIMEOUT、STEAM_RETRY_TIMES 或 "
             "GIFT_REQUEST_TIMEOUT、TRICKCAL_WEB_SESSION_DAYS 或 "
             "TRICKCAL_LOGIN_TICKET_MINUTES 格式无效。"
         ) from exc
@@ -93,16 +85,6 @@ def load_settings() -> Settings:
             "QQ_TOKEN_URL", "https://api.bot.qq.com/app/getAppAccessToken"
         ),
         log_level=os.getenv("LOG_LEVEL", "INFO").upper(),
-        steam_api_key=os.getenv("STEAM_API_KEY", "").strip(),
-        steam_api_base=os.getenv(
-            "STEAM_API_BASE", "https://api.steampowered.com"
-        ).rstrip("/"),
-        steam_request_timeout=max(5.0, min(60.0, steam_timeout)),
-        steam_retry_times=max(0, min(5, steam_retries)),
-        steam_monitor_enabled=os.getenv("STEAM_MONITOR_ENABLED", "false")
-        .strip()
-        .casefold()
-        in {"1", "true", "yes", "on"},
         gift_api_base_url=os.getenv("GIFT_API_BASE_URL", "").strip().rstrip("/"),
         gift_request_timeout=max(5.0, min(60.0, gift_timeout)),
         trickcal_mode=trickcal_mode,

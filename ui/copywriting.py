@@ -30,7 +30,6 @@ HELP_MARKDOWN = """# 📖 使用说明
 
 好吧，说明都整理好了。"""
 
-STEAM_PLACEHOLDER = "Steam 模块还没接入。施工进度比本市长预计得慢。"
 DAILY_DRAW_PLACEHOLDER = "还在配置。不是设计问题，是实现速度没跟上。"
 COLLECTION_PLACEHOLDER = "数据模块尚未接入。先别急着翻不存在的东西。"
 RANDOM_EXPERIMENT_PLACEHOLDER = (
@@ -57,4 +56,3 @@ def terminal_status_text(online: bool) -> str:
     if online:
         return "终端状态：在线\nGateway：已连接\n消息服务：正常"
     return "终端状态：连接异常\nGateway：未连接\n消息服务：等待恢复"
-

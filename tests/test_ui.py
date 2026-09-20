@@ -17,9 +17,6 @@ from ui.keyboards import (
     build_main_keyboard,
     build_notices_keyboard,
     build_services_keyboard,
-    build_steam_keyboard,
-    build_steam_result_keyboard,
-    build_steam_unbound_keyboard,
 )
 from ui import copywriting as copy
 from ui.menus import MenuService, TerminalStatus
@@ -77,9 +74,6 @@ class KeyboardTests(unittest.TestCase):
             build_collection_keyboard(),
             build_daily_draw_keyboard(),
             build_services_keyboard(),
-            build_steam_keyboard(),
-            build_steam_result_keyboard(),
-            build_steam_unbound_keyboard(),
             build_experiments_keyboard(),
             build_notices_keyboard(),
             build_help_keyboard(),
@@ -100,7 +94,6 @@ class KeyboardTests(unittest.TestCase):
         self.assertEqual(
             self._button_data(build_services_keyboard()),
             [
-                "/Steam监测站",
                 "/礼包查询",
                 "/每日单抽",
                 "/图鉴",
@@ -141,19 +134,7 @@ class KeyboardTests(unittest.TestCase):
             ["/图鉴", "/每日单抽", "/市政服务"],
         )
 
-    def test_steam_menu_is_shallow_and_uses_stable_data(self) -> None:
-        self.assertEqual(
-            self._button_data(build_steam_keyboard()),
-            ["/我的档案", "/当前状态", "/身份登记", "/市政服务"],
-        )
-        self.assertEqual(
-            self._button_data(build_steam_result_keyboard()),
-            ["/解除登记", "/Steam监测站"],
-        )
-        self.assertEqual(
-            self._button_data(build_steam_unbound_keyboard()),
-            ["/身份登记", "/Steam监测站"],
-        )
+    def test_non_service_menus_use_stable_data(self) -> None:
         self.assertEqual(
             self._button_data(build_experiments_keyboard()),
             ["/随机实验", "/对话测试", "/返回终端"],
