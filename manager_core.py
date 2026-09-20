@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import os
+import shutil
 import subprocess
 import sys
 from pathlib import Path
@@ -102,8 +103,41 @@ def launch_bot(runtime_directory: Path) -> subprocess.Popen[bytes]:
 
 
 def run_git(repository: Path, arguments: Iterable[str], *, timeout: int = 90) -> tuple[int, str]:
-    command = ["git", "-C", str(repository), *arguments]
-    completed = subprocess.run(command, text=True, capture_output=True, encoding="utf-8", errors="replace", timeout=timeout)
+    git = shutil.which("git") or "git"
+    environment = os.environ.copy()
+    # PyInstaller adjusts PATH while extracting a one-file EXE.  Explicitly
+    # retain Git's own helper directory so HTTPS pull/push can locate
+    # git-remote-https instead of failing only from ElenaManager.exe.
+    environment.pop("GIT_EXEC_PATH", None)
+    try:
+        probe = subprocess.run(
+            [git, "--exec-path"],
+            text=True,
+            capture_output=True,
+            encoding="utf-8",
+            errors="replace",
+            timeout=15,
+            env=environment,
+        )
+    except (OSError, subprocess.TimeoutExpired):
+        probe = None
+    if probe is not None and probe.returncode == 0:
+        helper_path = Path(probe.stdout.strip())
+        if helper_path.is_dir():
+            environment["GIT_EXEC_PATH"] = str(helper_path)
+    command = [git, "-C", str(repository), *arguments]
+    try:
+        completed = subprocess.run(
+            command,
+            text=True,
+            capture_output=True,
+            encoding="utf-8",
+            errors="replace",
+            timeout=timeout,
+            env=environment,
+        )
+    except (OSError, subprocess.TimeoutExpired) as exc:
+        return 1, str(exc)
     output = (completed.stdout + completed.stderr).strip()
     return completed.returncode, output or "（没有输出）"
 

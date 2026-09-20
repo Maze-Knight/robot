@@ -127,3 +127,20 @@ class ManagerCoreTests(unittest.TestCase):
 
         self.assertTrue(ok)
         self.assertEqual(output, "Already up to date.")
+
+    def test_git_runner_keeps_the_https_helper_path(self) -> None:
+        from manager_core import run_git
+
+        with tempfile.TemporaryDirectory() as temporary:
+            helper_path = Path(temporary) / "git-core"
+            helper_path.mkdir()
+            probe = SimpleNamespace(returncode=0, stdout=str(helper_path), stderr="")
+            command = SimpleNamespace(returncode=0, stdout="ok", stderr="")
+            with (
+                patch("manager_core.shutil.which", return_value="git.exe"),
+                patch("manager_core.subprocess.run", side_effect=[probe, command]) as run,
+            ):
+                code, output = run_git(Path("repository"), ["pull", "--ff-only"])
+
+        self.assertEqual((code, output), (0, "ok"))
+        self.assertEqual(run.call_args_list[1].kwargs["env"]["GIT_EXEC_PATH"], str(helper_path))
