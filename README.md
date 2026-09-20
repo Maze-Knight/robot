@@ -84,6 +84,10 @@ TRICKCAL_BOT_API_KEY=请填写强随机服务密钥
 
 旧的本地 Web/SQLite 实现保留为 `TRICKCAL_MODE=local` 的开发与回滚路径，默认不启动 `127.0.0.1:8080`。其旧配置为 **LEGACY ONLY**，来源审计与许可证边界记录见 [NOTICE_TRICKCAL.md](NOTICE_TRICKCAL.md)。
 
+### 🀄 自建雀魂数据服务（基础设施）
+
+第一阶段的本地服务边界见 [DEPLOY_MAJSOUL_DATA.md](DEPLOY_MAJSOUL_DATA.md)。默认 `MAJSOUL_DATA_MODE=public`，现有机器人仍使用公开数据路径；本地服务使用独立 SQLite 和 `127.0.0.1:8787`，不会自动随机器人启动，也不会主动访问第三方。切换到 `self_hosted` 前，必须先完成合法、获授权的数据同步方案验证。
+
 ## 技术选择（调研日期：2026-09-11）
 
 采用：

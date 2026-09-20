@@ -31,6 +31,8 @@ class Settings:
     trickcal_web_secure_cookie: bool
     trickcal_web_session_days: int
     trickcal_login_ticket_minutes: int
+    majsoul_data_mode: str
+    majsoul_data_api_base_url: str
 
     def apply_sdk_environment(self) -> None:
         """Set SDK endpoint overrides before qqbot_agent_sdk is imported."""
@@ -77,6 +79,10 @@ def load_settings() -> Settings:
     if trickcal_mode not in {"remote", "local", "disabled"}:
         trickcal_mode = "disabled"
 
+    majsoul_data_mode = os.getenv("MAJSOUL_DATA_MODE", "public").strip().casefold()
+    if majsoul_data_mode not in {"public", "self_hosted"}:
+        majsoul_data_mode = "public"
+
     return Settings(
         app_id=app_id,
         app_secret=app_secret,
@@ -99,4 +105,8 @@ def load_settings() -> Settings:
         in {"1", "true", "yes", "on"},
         trickcal_web_session_days=max(1, min(90, trickcal_session_days)),
         trickcal_login_ticket_minutes=max(1, min(30, trickcal_ticket_minutes)),
+        majsoul_data_mode=majsoul_data_mode,
+        majsoul_data_api_base_url=os.getenv(
+            "MAJSOUL_DATA_API_BASE_URL", "http://127.0.0.1:8787"
+        ).strip().rstrip("/"),
     )

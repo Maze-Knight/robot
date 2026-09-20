@@ -101,6 +101,8 @@ class ManagerCoreTests(unittest.TestCase):
         self.assertIn("TRICKCAL_MODE", ENVIRONMENT_KEYS)
         self.assertIn("TRICKCAL_API_BASE_URL", ENVIRONMENT_KEYS)
         self.assertIn("TRICKCAL_BOT_API_KEY", ENVIRONMENT_KEYS)
+        self.assertIn("MAJSOUL_DATA_MODE", ENVIRONMENT_KEYS)
+        self.assertIn("MAJSOUL_DATA_API_BASE_URL", ENVIRONMENT_KEYS)
 
     def test_staged_build_uses_a_temporary_manager_name(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:

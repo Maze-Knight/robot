@@ -103,6 +103,29 @@ class ConfigurationTests(unittest.TestCase):
             with self.assertRaisesRegex(ConfigurationError, "QQ_APP_ID.*QQ_APP_SECRET"):
                 load_settings()
 
+    def test_majsoul_data_mode_defaults_public_and_accepts_self_hosted(self) -> None:
+        with patch("config.load_dotenv"), patch.dict(
+            os.environ,
+            {
+                "QQ_APP_ID": "app",
+                "QQ_APP_SECRET": "secret",
+                "MAJSOUL_DATA_MODE": "self_hosted",
+                "MAJSOUL_DATA_API_BASE_URL": "http://127.0.0.1:8787/",
+            },
+            clear=True,
+        ):
+            settings = load_settings()
+        self.assertEqual(settings.majsoul_data_mode, "self_hosted")
+        self.assertEqual(settings.majsoul_data_api_base_url, "http://127.0.0.1:8787")
+
+        with patch("config.load_dotenv"), patch.dict(
+            os.environ,
+            {"QQ_APP_ID": "app", "QQ_APP_SECRET": "secret"},
+            clear=True,
+        ):
+            settings = load_settings()
+        self.assertEqual(settings.majsoul_data_mode, "public")
+
 
 class AdapterTests(unittest.IsolatedAsyncioTestCase):
     async def test_group_event_uses_openids_and_passive_reply(self) -> None:
