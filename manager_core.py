@@ -105,6 +105,23 @@ def launch_bot(runtime_directory: Path) -> subprocess.Popen[bytes]:
 def run_git(repository: Path, arguments: Iterable[str], *, timeout: int = 90) -> tuple[int, str]:
     git = shutil.which("git") or "git"
     environment = os.environ.copy()
+    git_path = Path(git)
+    if git_path.is_file():
+        git_root = git_path.parent.parent
+        git_bin = git_root / "mingw64" / "bin"
+        # A one-file PyInstaller process prepends its temporary DLL folder to
+        # PATH.  Put Git's own runtime first so libcurl/Schannel are loaded
+        # from the same Git installation as git.exe.
+        environment["PATH"] = os.pathsep.join(
+            str(path)
+            for path in (git_bin, git_path.parent, environment.get("PATH", ""))
+            if str(path)
+        )
+    user_home = environment.get("USERPROFILE") or str(Path.home())
+    environment.setdefault("HOME", user_home)
+    if len(user_home) >= 3 and user_home[1:3] == ":\\":
+        environment.setdefault("HOMEDRIVE", user_home[:2])
+        environment.setdefault("HOMEPATH", user_home[2:])
     # PyInstaller adjusts PATH while extracting a one-file EXE.  Explicitly
     # retain Git's own helper directory so HTTPS pull/push can locate
     # git-remote-https instead of failing only from ElenaManager.exe.

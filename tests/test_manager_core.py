@@ -142,5 +142,23 @@ class ManagerCoreTests(unittest.TestCase):
             ):
                 code, output = run_git(Path("repository"), ["pull", "--ff-only"])
 
-        self.assertEqual((code, output), (0, "ok"))
-        self.assertEqual(run.call_args_list[1].kwargs["env"]["GIT_EXEC_PATH"], str(helper_path))
+            self.assertEqual((code, output), (0, "ok"))
+            self.assertEqual(run.call_args_list[1].kwargs["env"]["GIT_EXEC_PATH"], str(helper_path))
+
+    def test_git_runner_prioritizes_its_own_runtime_and_user_home(self) -> None:
+        from manager_core import run_git
+
+        git = Path("C:/Tools/Git/cmd/git.exe")
+        probe = SimpleNamespace(returncode=1, stdout="", stderr="")
+        command = SimpleNamespace(returncode=0, stdout="ok", stderr="")
+        with (
+            patch("manager_core.shutil.which", return_value=str(git)),
+            patch("manager_core.Path.is_file", return_value=True),
+            patch("manager_core.subprocess.run", side_effect=[probe, command]) as run,
+            patch.dict("manager_core.os.environ", {"USERPROFILE": "C:\\Users\\Mayor", "PATH": "temporary"}, clear=True),
+        ):
+            run_git(Path("repository"), ["status"])
+
+        environment = run.call_args_list[1].kwargs["env"]
+        self.assertTrue(environment["PATH"].startswith("C:\\Tools\\Git\\mingw64\\bin"))
+        self.assertEqual(environment["HOME"], "C:\\Users\\Mayor")
